@@ -60,7 +60,7 @@
 </header>
 
 <style lang="postcss">
-	@reference '../routes/layout.css';
+	@reference '../../routes/layout.css';
 
 	header {
 		@apply fixed top-0 z-50 w-full p-4 text-orange;
