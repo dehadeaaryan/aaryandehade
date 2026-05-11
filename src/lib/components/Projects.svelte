@@ -325,7 +325,7 @@
 	@reference '../../routes/layout.css';
 
 	section {
-		@apply flex min-h-[100svh] w-full flex-col items-center overflow-hidden py-12 text-center md:py-24;
+		@apply flex min-h-svh w-full flex-col items-center overflow-hidden py-12 text-center md:py-24;
 	}
 
 	/* Header Styling */
@@ -352,7 +352,7 @@
 
 	/* Marquee Wrappers - Extended mask fade from 15% to 25% for a much softer blend */
 	.desktop-wrapper {
-		@apply relative hidden h-[40rem] w-full flex-row items-center justify-center gap-4 overflow-hidden bg-transparent lg:flex;
+		@apply relative hidden h-160 w-full flex-row items-center justify-center gap-4 overflow-hidden bg-transparent lg:flex;
 		mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
 		-webkit-mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
 		isolation: isolate;

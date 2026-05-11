@@ -195,7 +195,7 @@
 	@reference '../../routes/layout.css';
 
 	section {
-		@apply flex min-h-[100svh] w-full flex-col items-center overflow-hidden py-12 text-center md:py-24;
+		@apply flex min-h-svh w-full flex-col items-center overflow-hidden py-12 text-center md:py-24;
 	}
 
 	/* Header Styling */

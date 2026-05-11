@@ -132,9 +132,7 @@
 		<div class="bg-grid"></div>
 		<div class="hover-glow"></div>
 
-		<div
-			class="relative z-10 flex min-h-[30rem] w-full flex-1 flex-col justify-center pt-6 md:pt-8"
-		>
+		<div class="relative z-10 flex min-h-120 w-full flex-1 flex-col justify-center pt-6 md:pt-8">
 			<ArcTimeline
 				bind:activeStep
 				class="text-foreground [--description-color:var(--foreground)] [--icon-active-color:var(--orange)] [--icon-inactive-color:var(--muted-foreground)] [--placeholder-line-color:var(--border)] [--step-line-active-color:var(--orange)] [--step-line-inactive-color:var(--border)] [--time-active-color:var(--foreground)] [--time-inactive-color:var(--muted-foreground)]"
@@ -193,7 +191,7 @@
 	@reference '../../routes/layout.css';
 
 	section {
-		@apply flex min-h-[100svh] flex-col items-center justify-center px-4 py-12 text-center md:py-24;
+		@apply flex min-h-svh flex-col items-center justify-center px-4 py-12 text-center md:py-24;
 	}
 
 	.header-wrapper {
@@ -213,7 +211,7 @@
 	}
 
 	.glass-container {
-		@apply relative flex min-h-[35rem] w-full max-w-6xl flex-col overflow-hidden px-4 sm:px-8;
+		@apply relative flex min-h-140 w-full max-w-6xl flex-col overflow-hidden px-4 sm:px-8;
 		@apply rounded-[2.5rem] border border-white/40 transition-all duration-500 dark:border-white/10;
 		@apply bg-white/40 backdrop-blur-3xl backdrop-saturate-[2] dark:bg-black/40;
 		@apply shadow-[0_8px_40px_rgb(0,0,0,0.06)] dark:shadow-[0_8px_40px_rgb(0,0,0,0.3)];

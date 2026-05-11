@@ -142,11 +142,7 @@
 	}
 </script>
 
-<div
-	bind:this={ref}
-	class={cn('relative h-[380px] w-full overflow-hidden', className)}
-	{...restProps}
->
+<div bind:this={ref} class={cn('relative h-95 w-full overflow-hidden', className)} {...restProps}>
 	<div
 		class="absolute top-28 left-1/2 aspect-square origin-center rounded-full transition-all duration-500 ease-in-out"
 		style:transform={`translateX(-50%) rotate(${circleContainerRotateDeg}deg)`}
@@ -166,12 +162,12 @@
 
 				{#each beforePlaceholderAngles as fillAngle, fillIndex (`before-${fillIndex}`)}
 					<div
-						class="absolute top-0 left-1/2 h-[34px] w-[1px] -translate-x-1/2"
+						class="absolute top-0 left-1/2 h-8.5 w-px -translate-x-1/2"
 						style:transform-origin={`50% ${circleWidth / 2}px`}
 						style:transform={`rotate(${fillAngle}deg)`}
 					>
 						<div
-							class="h-full w-full bg-[var(--placeholder-line-color,#a1a1a1)] dark:bg-[var(--placeholder-line-color,#737373)]"
+							class="h-full w-full bg-(--placeholder-line-color,#a1a1a1) dark:bg-(--placeholder-line-color,#737373)"
 							style:transform-origin="center top"
 							style:transform={`rotate(${-fillAngle - circleContainerRotateDeg}deg)`}
 						></div>
@@ -182,7 +178,7 @@
 			<div
 				class={cn(
 					'absolute top-0 left-1/2 -translate-x-1/2 cursor-pointer transition-all duration-200',
-					active ? 'h-[120px] w-[2px]' : 'h-16 w-[1.5px]'
+					active ? 'h-30 w-0.5' : 'h-16 w-[1.5px]'
 				)}
 				role="button"
 				tabindex="0"
@@ -195,8 +191,8 @@
 					class={cn(
 						'h-full w-full transition-colors duration-200',
 						active
-							? 'bg-[var(--step-line-active-color,#888888)] dark:bg-[var(--step-line-active-color,#9780ff)]'
-							: 'bg-[var(--step-line-inactive-color,#b1b1b1)] dark:bg-[var(--step-line-inactive-color,#737373)]'
+							? 'bg-(--step-line-active-color,#888888) dark:bg-(--step-line-active-color,#9780ff)'
+							: 'bg-(--step-line-inactive-color,#b1b1b1) dark:bg-(--step-line-inactive-color,#737373)'
 					)}
 					style:transform-origin="center top"
 					style:transform={`rotate(${-timelineStep.angle - circleContainerRotateDeg}deg)`}
@@ -205,8 +201,8 @@
 						class={cn(
 							'absolute bottom-0 left-1/2 aspect-square -translate-x-1/2',
 							active
-								? 'translate-y-[calc(100%_+_14px)] scale-[1.2] text-[var(--icon-active-color,#555555)] dark:text-[var(--icon-active-color,#d4d4d4)]'
-								: 'translate-y-[calc(100%_+_4px)] scale-100 text-[var(--icon-inactive-color,#a3a3a3)] dark:text-[var(--icon-inactive-color,#a3a3a3)]'
+								? 'translate-y-[calc(100%+14px)] scale-[1.2] text-(--icon-active-color,#555555) dark:text-(--icon-active-color,#d4d4d4)'
+								: 'translate-y-[calc(100%+4px)] scale-100 text-(--icon-inactive-color,#a3a3a3) dark:text-(--icon-inactive-color,#a3a3a3)'
 						)}
 					>
 						{#if iconSnippet}
@@ -218,8 +214,8 @@
 
 					<p
 						class={cn(
-							'absolute bottom-0 left-1/2 line-clamp-3 flex w-[240px] -translate-x-1/2 translate-y-[calc(100%_+_42px)] items-center justify-center text-center text-sm transition-opacity duration-300 ease-in',
-							'text-[var(--description-color,#555555)] dark:text-[var(--description-color,#d4d4d4)]',
+							'absolute bottom-0 left-1/2 line-clamp-3 flex w-60 -translate-x-1/2 translate-y-[calc(100%+42px)] items-center justify-center text-center text-sm transition-opacity duration-300 ease-in',
+							'text-(--description-color,#555555) dark:text-(--description-color,#d4d4d4)',
 							active ? 'opacity-100' : 'opacity-0'
 						)}
 					>
@@ -236,8 +232,8 @@
 						class={cn(
 							'absolute top-0 left-1/2 z-10 -translate-x-1/2 translate-y-[calc(-100%-24px)] whitespace-nowrap',
 							active
-								? 'text-[var(--time-active-color,#555555)] dark:text-[var(--time-active-color,#d4d4d4)]'
-								: 'text-[var(--time-inactive-color,#a3a3a3)] dark:text-[var(--time-inactive-color,#a3a3a3)]'
+								? 'text-(--time-active-color,#555555) dark:text-(--time-active-color,#d4d4d4)'
+								: 'text-(--time-inactive-color,#a3a3a3) dark:text-(--time-inactive-color,#a3a3a3)'
 						)}
 					>
 						{#if timeSnippet}
@@ -257,12 +253,12 @@
 
 			{#each afterPlaceholderAngles as fillAngle, fillIndex (`after-${fillIndex}`)}
 				<div
-					class="absolute top-0 left-1/2 h-[34px] w-[1px] -translate-x-1/2"
+					class="absolute top-0 left-1/2 h-8.5 w-px -translate-x-1/2"
 					style:transform-origin={`50% ${circleWidth / 2}px`}
 					style:transform={`rotate(${fillAngle}deg)`}
 				>
 					<div
-						class="h-full w-full bg-[var(--placeholder-line-color,#a1a1a1)] dark:bg-[var(--placeholder-line-color,#737373)]"
+						class="h-full w-full bg-(--placeholder-line-color,#a1a1a1) dark:bg-(--placeholder-line-color,#737373)"
 						style:transform-origin="center top"
 						style:transform={`rotate(${-fillAngle - circleContainerRotateDeg}deg)`}
 					></div>
