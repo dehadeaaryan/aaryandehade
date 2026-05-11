@@ -124,18 +124,6 @@
 			categories: ['Python', 'AI/ML']
 		},
 		{
-			title: 'AI Making Shopping Smart',
-			description: 'AI-based project for smarter shopping experiences',
-			link: 'https://github.com/dehadeaaryan/ai-making-shopping-smart',
-			categories: ['Python', 'AI/ML']
-		},
-		{
-			title: 'AI Search and Games',
-			description: 'AI algorithms for game theory and search problems',
-			link: 'https://github.com/dehadeaaryan/ai-search-and-games',
-			categories: ['Python', 'AI/ML']
-		},
-		{
 			title: 'Tank War Game',
 			description: '2D action game inspired by Battle City',
 			link: 'https://github.com/dehadeaaryan/tank-war-game',
@@ -222,17 +210,15 @@
 		'ai.tcu.edu'
 	].map((title) => allProjects.find((p) => p.title === title)!);
 
-	const aiDataBackend = [
+	const dataAndBackend = [
 		'SuperFrog Scheduler Backend',
 		'ASL to English',
-		'AI Making Shopping Smart',
-		'AI Search and Games',
 		'Book Manager MySQL',
 		'Book Manager Mongo',
 		'Turtler'
 	].map((title) => allProjects.find((p) => p.title === title)!);
 
-	const systemsAndLowLevel = [
+	const systemsAndLogic = [
 		'Marie Simulator',
 		'Sudoku Solver',
 		'Maze Solver',
@@ -242,7 +228,7 @@
 		'Rabbit Fox Island'
 	].map((title) => allProjects.find((p) => p.title === title)!);
 
-	const mobileLibsTools = [
+	const mobileAndTools = [
 		'JustDropIt',
 		'Discord Bot Maker',
 		'Music.www',
@@ -278,17 +264,17 @@
 						{/each}
 					</Marquee>
 					<Marquee pauseOnHover reverse vertical class="w-72 [--duration:60s] [--gap:1rem]">
-						{#each aiDataBackend as project}
+						{#each dataAndBackend as project}
 							<ProjectCard {...project} />
 						{/each}
 					</Marquee>
 					<Marquee pauseOnHover vertical class="w-72 [--duration:60s] [--gap:1rem]">
-						{#each systemsAndLowLevel as project}
+						{#each systemsAndLogic as project}
 							<ProjectCard {...project} />
 						{/each}
 					</Marquee>
 					<Marquee pauseOnHover reverse vertical class="w-72 [--duration:80s] [--gap:1rem]">
-						{#each mobileLibsTools as project}
+						{#each mobileAndTools as project}
 							<ProjectCard {...project} />
 						{/each}
 					</Marquee>
@@ -302,17 +288,17 @@
 					{/each}
 				</Marquee>
 				<Marquee pauseOnHover reverse class="w-full [--duration:50s] [--gap:1rem]">
-					{#each aiDataBackend as project}
+					{#each dataAndBackend as project}
 						<ProjectCard {...project} />
 					{/each}
 				</Marquee>
 				<Marquee pauseOnHover class="w-full [--duration:50s] [--gap:1rem]">
-					{#each systemsAndLowLevel as project}
+					{#each systemsAndLogic as project}
 						<ProjectCard {...project} />
 					{/each}
 				</Marquee>
 				<Marquee pauseOnHover reverse class="w-full [--duration:50s] [--gap:1rem]">
-					{#each mobileLibsTools as project}
+					{#each mobileAndTools as project}
 						<ProjectCard {...project} />
 					{/each}
 				</Marquee>
@@ -328,7 +314,6 @@
 		@apply flex min-h-svh w-full flex-col items-center overflow-hidden py-12 text-center md:py-24;
 	}
 
-	/* Header Styling */
 	.header-wrapper {
 		@apply mb-12 flex flex-col items-center justify-center gap-4 px-4;
 	}
@@ -345,12 +330,10 @@
 		@apply max-w-lg text-sm leading-relaxed font-medium text-balance text-foreground/60 md:text-base;
 	}
 
-	/* Showcase Container - Completely Transparent */
 	.projects-showcase {
 		@apply relative flex w-full flex-1 flex-col items-center justify-center bg-transparent py-4;
 	}
 
-	/* Marquee Wrappers - Extended mask fade from 15% to 25% for a much softer blend */
 	.desktop-wrapper {
 		@apply relative hidden h-160 w-full flex-row items-center justify-center gap-4 overflow-hidden bg-transparent lg:flex;
 		mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);

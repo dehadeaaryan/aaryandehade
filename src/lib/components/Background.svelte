@@ -8,7 +8,6 @@
 	let currentY = $state(0);
 
 	$effect(() => {
-		// Initialize at the center of the screen so it doesn't pull to the top-left on load
 		if (width && height) {
 			targetX = width / 2;
 			targetY = height / 2;
@@ -41,7 +40,7 @@
 <svelte:window bind:innerWidth={width} bind:innerHeight={height} onmousemove={handleMouseMove} />
 
 <div
-	class="pointer-events-none fixed inset-0 -z-10 h-full w-full overflow-hidden bg-background"
+	class="pointer-events-none fixed top-0 left-0 -z-10 h-[100lvh] w-full overflow-hidden bg-background"
 	style="perspective: 1000px;"
 >
 	<div class="absolute inset-0" style:transform style="transform-style: preserve-3d;">
@@ -73,7 +72,6 @@
 		will-change: transform;
 	}
 
-	/* Swapped 'linear' for 'ease-in-out' so they naturally slow down into the curves */
 	.blob-orange-1 {
 		background: radial-gradient(
 			circle at center,
@@ -110,7 +108,6 @@
 			squish 11s infinite alternate ease-in-out;
 	}
 
-	/* Added more waypoints (25, 50, 75) to create smooth, sweeping oval paths instead of sharp triangles */
 	@keyframes float-1 {
 		0% {
 			transform: translate(0, 0) scale(1);
