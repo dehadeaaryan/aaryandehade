@@ -15,22 +15,27 @@
 	let canScrollNext = $state(true);
 
 	$effect(() => {
-		if (api) {
-			current = api.selectedScrollSnap();
-			canScrollPrev = api.canScrollPrev();
-			canScrollNext = api.canScrollNext();
+		const emblaApi = api;
+		if (!emblaApi) return;
 
-			api.on('select', () => {
-				current = api!.selectedScrollSnap();
-				canScrollPrev = api!.canScrollPrev();
-				canScrollNext = api!.canScrollNext();
-			});
-		}
+		const onSelect = () => {
+			current = emblaApi.selectedScrollSnap();
+			canScrollPrev = emblaApi.canScrollPrev();
+			canScrollNext = emblaApi.canScrollNext();
+		};
+
+		emblaApi.on('select', onSelect);
+		onSelect(); // Initial sync
+
+		return () => {
+			emblaApi.off('select', onSelect);
+		};
 	});
 
 	const experiences = [
 		{
 			company: 'Apple',
+			link: 'https://www.apple.com',
 			title: 'Software Development Engineer in Test',
 			dates: 'July 2025 - Present',
 			description: [
@@ -43,6 +48,7 @@
 		},
 		{
 			company: 'iPELiNT',
+			link: 'https://www.ipelint.com',
 			title: 'Senior Design Project',
 			dates: 'Sept 2024 - May 2025',
 			description: [
@@ -54,6 +60,7 @@
 		},
 		{
 			company: 'Qualcomm',
+			link: 'https://www.qualcomm.com',
 			title: 'SWE Intern (2024)',
 			dates: 'May 2024 - Aug 2024',
 			description: [
@@ -66,6 +73,7 @@
 		},
 		{
 			company: 'Qualcomm',
+			link: 'https://www.qualcomm.com',
 			title: 'SWE Intern (2023)',
 			dates: 'May 2023 - Aug 2023',
 			description: [
@@ -78,81 +86,107 @@
 </script>
 
 <section id="experience">
-	<h2 id="experience-title" class="section-title">Experience</h2>
-
-	<div
-		id="experience-carousel"
-		class="carousel-wrapper"
-		role="region"
-		aria-roledescription="carousel"
-		aria-labelledby="experience-title"
-	>
-		<Carousel.Root setApi={(emblaApi) => (api = emblaApi)} class="carousel-root">
-			<Carousel.Content>
-				{#each experiences as experience}
-					<Carousel.Item class="carousel-item">
-						<div class="glass-card">
-							<div class="card-header">
-								<div class="logo-container">
-									<img src={experience.logo} alt="{experience.company} logo" class="card-logo" />
-								</div>
-								<div class="header-text-container">
-									<div class="title-row">
-										<h3 class="card-title">{experience.title}</h3>
-										<span class="date-pill">{experience.dates}</span>
-									</div>
-									<p class="card-company">{experience.company}</p>
-								</div>
-							</div>
-
-							<div class="card-body">
-								<ul class="card-description">
-									{#each experience.description as point}
-										<li>{point}</li>
-									{/each}
-								</ul>
-							</div>
-						</div>
-					</Carousel.Item>
-				{/each}
-			</Carousel.Content>
-		</Carousel.Root>
-
-		<button
-			class="custom-nav-button left-btn"
-			class:opacity-30={!canScrollPrev}
-			class:pointer-events-none={!canScrollPrev}
-			onclick={() => api?.scrollPrev()}
-			aria-label="Previous slide"
-		>
-			<ChevronLeft size={28} strokeWidth={2.5} />
-		</button>
-
-		<button
-			class="custom-nav-button right-btn"
-			class:opacity-30={!canScrollNext}
-			class:pointer-events-none={!canScrollNext}
-			onclick={() => api?.scrollNext()}
-			aria-label="Next slide"
-		>
-			<ChevronRight size={28} strokeWidth={2.5} />
-		</button>
+	<div class="header-wrapper">
+		<span class="theme-badge">Career</span>
+		<h2 id="experience-title" class="section-title">Experience</h2>
+		<p class="section-subtitle">
+			My professional journey, internships, and technical contributions.
+		</p>
 	</div>
 
-	<div class="tabs-wrapper">
-		<div class="tabs-container" role="tablist" aria-label="Experience slides">
-			{#each experiences as experience, i}
+	<div class="experience-showcase group">
+		<div class="bg-grid"></div>
+		<div class="hover-glow"></div>
+
+		<div class="relative z-10 flex w-full flex-col items-center justify-center">
+			<div
+				id="experience-carousel"
+				class="carousel-wrapper"
+				role="region"
+				aria-roledescription="carousel"
+				aria-labelledby="experience-title"
+			>
+				<Carousel.Root setApi={(emblaApi) => (api = emblaApi)} class="carousel-root">
+					<Carousel.Content>
+						{#each experiences as experience}
+							<Carousel.Item class="carousel-item">
+								<div class="card-spacing-wrapper">
+									<div class="glass-card">
+										<div class="card-header">
+											<div class="logo-container">
+												<img
+													src={experience.logo}
+													alt="{experience.company} logo"
+													class="card-logo"
+												/>
+											</div>
+											<div class="header-text-container">
+												<div class="title-row">
+													<h3 class="card-title">{experience.title}</h3>
+													<span class="date-pill">{experience.dates}</span>
+												</div>
+												<a
+													href={experience.link}
+													target="_blank"
+													rel="noopener noreferrer"
+													class="card-company"
+												>
+													{experience.company}
+												</a>
+											</div>
+										</div>
+
+										<div class="card-body">
+											<ul class="card-description">
+												{#each experience.description as point}
+													<li>{point}</li>
+												{/each}
+											</ul>
+										</div>
+									</div>
+								</div>
+							</Carousel.Item>
+						{/each}
+					</Carousel.Content>
+				</Carousel.Root>
+
 				<button
-					class="glass-tab"
-					role="tab"
-					aria-selected={current === i}
-					aria-controls="experience-carousel"
-					class:active={current === i}
-					onclick={() => api?.scrollTo(i)}
+					class="custom-nav-button left-btn"
+					class:opacity-30={!canScrollPrev}
+					class:pointer-events-none={!canScrollPrev}
+					onclick={() => api?.scrollPrev()}
+					aria-label="Previous slide"
 				>
-					{experience.company}
+					<ChevronLeft size={28} strokeWidth={2.5} />
 				</button>
-			{/each}
+
+				<button
+					class="custom-nav-button right-btn"
+					class:opacity-30={!canScrollNext}
+					class:pointer-events-none={!canScrollNext}
+					onclick={() => api?.scrollNext()}
+					aria-label="Next slide"
+				>
+					<ChevronRight size={28} strokeWidth={2.5} />
+				</button>
+			</div>
+
+			<div class="tabs-wrapper">
+				<div class="tabs-container" role="tablist" aria-label="Experience slides">
+					{#each experiences as experience, i}
+						<button
+							class="glass-tab"
+							role="tab"
+							aria-selected={current === i}
+							aria-controls="experience-carousel"
+							class:active={current === i}
+							onclick={() => api?.scrollTo(i)}
+						>
+							{experience.company}
+						</button>
+					{/each}
+				</div>
+			</div>
 		</div>
 	</div>
 </section>
@@ -161,15 +195,50 @@
 	@reference '../../routes/layout.css';
 
 	section {
-		@apply flex min-h-[100svh] flex-col items-center px-4 py-6 text-center md:py-20;
+		@apply flex min-h-[100svh] w-full flex-col items-center overflow-hidden py-12 text-center md:py-24;
+	}
+
+	/* Header Styling */
+	.header-wrapper {
+		@apply mb-12 flex flex-col items-center justify-center gap-4 px-4;
+	}
+
+	.theme-badge {
+		@apply rounded-full border border-orange/30 bg-orange/10 px-4 py-1.5 text-xs font-black tracking-[0.2em] text-orange uppercase shadow-sm backdrop-blur-md;
 	}
 
 	.section-title {
-		@apply mt-8 mb-4 text-4xl font-black tracking-tight md:mt-0 md:mb-12 md:text-5xl lg:text-6xl;
+		@apply m-0 text-4xl font-black tracking-tight text-foreground md:text-5xl lg:text-6xl;
 	}
 
+	.section-subtitle {
+		@apply max-w-lg text-sm leading-relaxed font-medium text-balance text-foreground/60 md:text-base;
+	}
+
+	/* Showcase Container */
+	.experience-showcase {
+		@apply relative flex w-full flex-1 flex-col items-center justify-center px-4 py-4 sm:px-8;
+	}
+
+	.bg-grid {
+		@apply pointer-events-none absolute inset-0 z-0 opacity-30 dark:opacity-20;
+		background-image:
+			linear-gradient(to right, #8882 1px, transparent 1px),
+			linear-gradient(to bottom, #8882 1px, transparent 1px);
+		background-size: 32px 32px;
+		mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, black 20%, transparent 100%);
+		-webkit-mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, black 20%, transparent 100%);
+	}
+
+	.hover-glow {
+		@apply pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100;
+		background: radial-gradient(circle 800px at 50% 50%, rgba(255, 165, 0, 0.08), transparent 70%);
+	}
+
+	/* Carousel Structure */
 	.carousel-wrapper {
-		@apply relative mb-4 flex w-full max-w-4xl flex-1 flex-col md:mb-8;
+		/* Bumped to max-w-5xl to account for the new inner padding */
+		@apply relative mb-6 flex w-full max-w-5xl flex-1 flex-col md:mb-8;
 	}
 
 	:global(.carousel-root) {
@@ -180,12 +249,13 @@
 		@apply flex min-h-0 w-full flex-1 flex-col overflow-hidden;
 	}
 
-	:global([data-embla-container]) {
-		@apply flex h-full flex-1 items-stretch;
-	}
-
 	:global(.carousel-item) {
 		@apply flex min-w-0 basis-full flex-col pl-4;
+	}
+
+	/* Spacing Wrapper Fix */
+	.card-spacing-wrapper {
+		@apply flex h-full w-full flex-col px-2 py-8 md:px-4; /* Provides top/bottom breathing room for transforms & shadows */
 	}
 
 	/* Base Card Structure */
@@ -193,6 +263,7 @@
 		@apply mx-auto flex w-full flex-1 flex-col overflow-hidden text-left;
 		@apply rounded-[2rem] border border-white/40 transition-all duration-300 dark:border-white/10;
 		@apply bg-white/45 backdrop-blur-3xl backdrop-saturate-[1.8] dark:bg-black/40;
+		@apply hover:-translate-y-1 hover:border-white/60 dark:hover:border-white/20;
 	}
 
 	/* Premium Header Design */
@@ -201,7 +272,6 @@
 	}
 
 	.logo-container {
-		/* Gives the logo a sleek iOS-app-icon aesthetic */
 		@apply flex size-16 shrink-0 items-center justify-center rounded-2xl bg-white p-2 shadow-lg md:size-20;
 	}
 
@@ -226,7 +296,7 @@
 	}
 
 	.card-company {
-		@apply text-lg font-black text-orange md:text-xl;
+		@apply inline-block w-fit text-lg font-black text-orange transition-all duration-300 hover:underline hover:opacity-80 md:text-xl;
 	}
 
 	/* Content Body Design */
@@ -249,7 +319,6 @@
 		@apply relative pl-6 text-sm leading-relaxed text-foreground/90 md:text-base;
 	}
 
-	/* Creates a custom orange dot for the list items instead of standard boring bullets */
 	.card-description li::before {
 		content: '';
 		@apply absolute top-[0.55rem] left-0 size-2 rounded-full bg-orange opacity-80;
@@ -257,21 +326,21 @@
 
 	/* Navigation */
 	.custom-nav-button {
-		@apply absolute top-[40%] hidden h-14 w-14 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-foreground transition-all duration-300 md:flex;
+		@apply absolute top-[50%] hidden h-14 w-14 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-foreground transition-all duration-300 md:flex;
 		@apply border border-white/40 bg-white/30 shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-black/40;
 		@apply hover:scale-110 hover:bg-white/60 hover:text-orange dark:hover:bg-white/20;
 	}
 
 	.left-btn {
-		@apply -left-6 xl:-left-16;
+		@apply -left-2 xl:-left-12; /* Adjusted slightly inward to account for wider container */
 	}
 
 	.right-btn {
-		@apply -right-6 xl:-right-16;
+		@apply -right-2 xl:-right-12;
 	}
 
 	.tabs-wrapper {
-		@apply flex w-full justify-center px-2 pt-2 pb-4 md:px-4 md:pt-0;
+		@apply relative z-10 flex w-full justify-center px-2 pt-2 pb-4 md:px-4 md:pt-0;
 	}
 
 	.tabs-container {
@@ -289,6 +358,6 @@
 	}
 
 	.glass-tab.active {
-		@apply bg-white/60 text-orange shadow-sm dark:bg-white/10;
+		@apply bg-white/60 text-orange dark:bg-white/10;
 	}
 </style>

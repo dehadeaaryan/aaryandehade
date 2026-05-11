@@ -9,7 +9,9 @@
 		Mic,
 		School,
 		Star,
-		Users
+		Users,
+		ChevronLeft,
+		ChevronRight
 	} from '@lucide/svelte/icons';
 
 	const ACADEMIC_TIMELINE: ArcTimelineItem[] = [
@@ -86,6 +88,37 @@
 			]
 		}
 	];
+
+	// Create a flattened array of all steps to make navigation math easy
+	const allSteps: { time: string; stepIndex: number }[] = ACADEMIC_TIMELINE.flatMap((year) =>
+		year.steps.map((_, sIndex) => ({
+			time: String(year.time), // Ensure time is a string
+			stepIndex: sIndex
+		}))
+	);
+
+	// Track the active step (Start at the final 2025 step)
+	let activeStep = $state({ time: '2025', stepIndex: 0 });
+
+	// Derive the current index to control the disabled state of the buttons
+	let currentIndex = $derived(
+		allSteps.findIndex((s) => s.time === activeStep.time && s.stepIndex === activeStep.stepIndex)
+	);
+
+	let canScrollPrev = $derived(currentIndex > 0);
+	let canScrollNext = $derived(currentIndex < allSteps.length - 1 && currentIndex !== -1);
+
+	function goPrev() {
+		if (canScrollPrev) {
+			activeStep = allSteps[currentIndex - 1];
+		}
+	}
+
+	function goNext() {
+		if (canScrollNext) {
+			activeStep = allSteps[currentIndex + 1];
+		}
+	}
 </script>
 
 <section id="academics">
@@ -99,12 +132,34 @@
 		<div class="bg-grid"></div>
 		<div class="hover-glow"></div>
 
-		<div class="relative z-10 flex h-[35rem] w-full flex-col justify-center">
+		<div
+			class="relative z-10 flex min-h-[30rem] w-full flex-1 flex-col justify-center pt-6 md:pt-8"
+		>
 			<ArcTimeline
+				bind:activeStep
 				class="text-foreground [--description-color:var(--foreground)] [--icon-active-color:var(--orange)] [--icon-inactive-color:var(--muted-foreground)] [--placeholder-line-color:var(--border)] [--step-line-active-color:var(--orange)] [--step-line-inactive-color:var(--border)] [--time-active-color:var(--foreground)] [--time-inactive-color:var(--muted-foreground)]"
 				data={ACADEMIC_TIMELINE}
-				defaultActiveStep={{ time: '2025', stepIndex: 0 }}
 			/>
+		</div>
+
+		<div class="relative z-10 flex w-full items-center justify-center gap-4 pt-4 pb-8">
+			<button
+				class="nav-button"
+				disabled={!canScrollPrev}
+				onclick={goPrev}
+				aria-label="Previous milestone"
+			>
+				<ChevronLeft size={24} strokeWidth={2.5} />
+			</button>
+
+			<button
+				class="nav-button"
+				disabled={!canScrollNext}
+				onclick={goNext}
+				aria-label="Next milestone"
+			>
+				<ChevronRight size={24} strokeWidth={2.5} />
+			</button>
 		</div>
 	</div>
 </section>
@@ -158,7 +213,7 @@
 	}
 
 	.glass-container {
-		@apply relative w-full max-w-6xl overflow-hidden px-4 sm:px-8;
+		@apply relative flex min-h-[35rem] w-full max-w-6xl flex-col overflow-hidden px-4 sm:px-8;
 		@apply rounded-[2.5rem] border border-white/40 transition-all duration-500 dark:border-white/10;
 		@apply bg-white/40 backdrop-blur-3xl backdrop-saturate-[2] dark:bg-black/40;
 		@apply shadow-[0_8px_40px_rgb(0,0,0,0.06)] dark:shadow-[0_8px_40px_rgb(0,0,0,0.3)];
@@ -178,5 +233,13 @@
 	.hover-glow {
 		@apply pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100;
 		background: radial-gradient(circle 800px at 50% -20%, rgba(255, 165, 0, 0.12), transparent 70%);
+	}
+
+	/* Interactive Navigation Buttons */
+	.nav-button {
+		@apply flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-foreground transition-all duration-300;
+		@apply border border-white/40 bg-white/30 shadow-md backdrop-blur-xl dark:border-white/10 dark:bg-black/40;
+		@apply hover:scale-110 hover:border-white/60 hover:bg-white/60 hover:text-orange dark:hover:border-white/20 dark:hover:bg-white/20;
+		@apply disabled:pointer-events-none disabled:opacity-30;
 	}
 </style>

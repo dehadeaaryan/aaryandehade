@@ -18,8 +18,12 @@
 
 <style lang="postcss">
 	@reference './layout.css';
-	/* Global smooth scroll for anchor links */
+
 	:global(html) {
-		@apply scroll-smooth;
+		@apply overscroll-none scroll-smooth;
+	}
+
+	:global(body) {
+		@apply overscroll-none;
 	}
 </style>

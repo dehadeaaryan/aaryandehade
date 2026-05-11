@@ -257,57 +257,67 @@
 </script>
 
 <section id="projects">
-	<h2 class="section-title">Projects</h2>
-
-	<div class="desktop-wrapper" style="perspective: 1000px; transform-style: preserve-3d;">
-		<div
-			class="flex flex-row items-center gap-4"
-			style="transform:translateX(-100px) translateY(0px) translateZ(-100px) rotateX(20deg) rotateY(-10deg) rotateZ(20deg); transform-style: preserve-3d;"
-		>
-			<Marquee pauseOnHover vertical class="w-72 [--duration:80s] [--gap:1rem]">
-				{#each webAndFullStack as project}
-					<ProjectCard {...project} />
-				{/each}
-			</Marquee>
-			<Marquee reverse pauseOnHover vertical class="w-72 [--duration:60s] [--gap:1rem]">
-				{#each aiDataBackend as project}
-					<ProjectCard {...project} />
-				{/each}
-			</Marquee>
-			<Marquee pauseOnHover vertical class="w-72 [--duration:60s] [--gap:1rem]">
-				{#each systemsAndLowLevel as project}
-					<ProjectCard {...project} />
-				{/each}
-			</Marquee>
-			<Marquee reverse pauseOnHover vertical class="w-72 [--duration:80s] [--gap:1rem]">
-				{#each mobileLibsTools as project}
-					<ProjectCard {...project} />
-				{/each}
-			</Marquee>
-		</div>
+	<div class="header-wrapper">
+		<span class="theme-badge">Portfolio</span>
+		<h2 class="section-title">Projects</h2>
+		<p class="section-subtitle">
+			A collection of my web applications, machine learning models, and software utilities.
+		</p>
 	</div>
 
-	<div class="mobile-wrapper">
-		<Marquee pauseOnHover class="w-full [--duration:50s] [--gap:1rem]">
-			{#each webAndFullStack as project}
-				<ProjectCard {...project} />
-			{/each}
-		</Marquee>
-		<Marquee reverse pauseOnHover class="w-full [--duration:50s] [--gap:1rem]">
-			{#each aiDataBackend as project}
-				<ProjectCard {...project} />
-			{/each}
-		</Marquee>
-		<Marquee pauseOnHover class="w-full [--duration:50s] [--gap:1rem]">
-			{#each systemsAndLowLevel as project}
-				<ProjectCard {...project} />
-			{/each}
-		</Marquee>
-		<Marquee reverse pauseOnHover class="w-full [--duration:50s] [--gap:1rem]">
-			{#each mobileLibsTools as project}
-				<ProjectCard {...project} />
-			{/each}
-		</Marquee>
+	<div class="projects-showcase group/showcase">
+		<div class="relative z-10 w-full">
+			<div class="desktop-wrapper" style="perspective: 1000px; transform-style: preserve-3d;">
+				<div
+					class="flex flex-row items-center gap-4"
+					style="transform:translateX(-100px) translateY(0px) translateZ(-100px) rotateX(20deg) rotateY(-10deg) rotateZ(20deg); transform-style: preserve-3d;"
+				>
+					<Marquee pauseOnHover vertical class="w-72 [--duration:80s] [--gap:1rem]">
+						{#each webAndFullStack as project}
+							<ProjectCard {...project} />
+						{/each}
+					</Marquee>
+					<Marquee pauseOnHover reverse vertical class="w-72 [--duration:60s] [--gap:1rem]">
+						{#each aiDataBackend as project}
+							<ProjectCard {...project} />
+						{/each}
+					</Marquee>
+					<Marquee pauseOnHover vertical class="w-72 [--duration:60s] [--gap:1rem]">
+						{#each systemsAndLowLevel as project}
+							<ProjectCard {...project} />
+						{/each}
+					</Marquee>
+					<Marquee pauseOnHover reverse vertical class="w-72 [--duration:80s] [--gap:1rem]">
+						{#each mobileLibsTools as project}
+							<ProjectCard {...project} />
+						{/each}
+					</Marquee>
+				</div>
+			</div>
+
+			<div class="mobile-wrapper">
+				<Marquee pauseOnHover class="w-full [--duration:50s] [--gap:1rem]">
+					{#each webAndFullStack as project}
+						<ProjectCard {...project} />
+					{/each}
+				</Marquee>
+				<Marquee pauseOnHover reverse class="w-full [--duration:50s] [--gap:1rem]">
+					{#each aiDataBackend as project}
+						<ProjectCard {...project} />
+					{/each}
+				</Marquee>
+				<Marquee pauseOnHover class="w-full [--duration:50s] [--gap:1rem]">
+					{#each systemsAndLowLevel as project}
+						<ProjectCard {...project} />
+					{/each}
+				</Marquee>
+				<Marquee pauseOnHover reverse class="w-full [--duration:50s] [--gap:1rem]">
+					{#each mobileLibsTools as project}
+						<ProjectCard {...project} />
+					{/each}
+				</Marquee>
+			</div>
+		</div>
 	</div>
 </section>
 
@@ -315,26 +325,45 @@
 	@reference '../../routes/layout.css';
 
 	section {
-		@apply flex min-h-[100svh] flex-col items-center px-4 py-6 text-center md:py-20;
+		@apply flex min-h-[100svh] w-full flex-col items-center overflow-hidden py-12 text-center md:py-24;
+	}
+
+	/* Header Styling */
+	.header-wrapper {
+		@apply mb-12 flex flex-col items-center justify-center gap-4 px-4;
+	}
+
+	.theme-badge {
+		@apply rounded-full border border-orange/30 bg-orange/10 px-4 py-1.5 text-xs font-black tracking-[0.2em] text-orange uppercase shadow-sm backdrop-blur-md;
 	}
 
 	.section-title {
-		@apply mt-8 mb-4 text-4xl font-black tracking-tight md:mt-0 md:mb-12 md:text-5xl lg:text-6xl;
+		@apply m-0 text-4xl font-black tracking-tight text-foreground md:text-5xl lg:text-6xl;
 	}
 
+	.section-subtitle {
+		@apply max-w-lg text-sm leading-relaxed font-medium text-balance text-foreground/60 md:text-base;
+	}
+
+	/* Showcase Container - Completely Transparent */
+	.projects-showcase {
+		@apply relative flex w-full flex-1 flex-col items-center justify-center bg-transparent py-4;
+	}
+
+	/* Marquee Wrappers - Extended mask fade from 15% to 25% for a much softer blend */
 	.desktop-wrapper {
-		@apply relative hidden h-[40rem] w-full flex-row items-center justify-center gap-4 overflow-hidden md:flex;
-		mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
-		-webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+		@apply relative hidden h-[40rem] w-full flex-row items-center justify-center gap-4 overflow-hidden bg-transparent lg:flex;
+		mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
+		-webkit-mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
 		isolation: isolate;
 		transform: translateZ(0);
 		will-change: transform;
 	}
 
 	.mobile-wrapper {
-		@apply relative flex w-full flex-col items-center justify-center gap-4 overflow-hidden py-4 md:hidden;
-		mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-		-webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+		@apply relative flex w-full flex-col items-center justify-center gap-4 overflow-hidden bg-transparent py-4 lg:hidden;
+		mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+		-webkit-mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
 		isolation: isolate;
 		transform: translateZ(0);
 		will-change: transform;

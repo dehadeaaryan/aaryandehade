@@ -32,7 +32,7 @@
 		@apply flex flex-row items-center gap-2;
 	}
 	span a {
-		@apply flex cursor-pointer flex-row items-center justify-center gap-1 rounded-full border border-neutral-500 px-4 py-2 text-xs transition-colors duration-300 hover:bg-foreground hover:text-background md:text-base;
+		@apply flex cursor-pointer flex-row items-center justify-center gap-1 rounded-full border border-neutral-700 px-4 py-2 text-xs transition-colors duration-300 hover:bg-foreground hover:text-background md:text-base dark:border-neutral-300;
 	}
 
 	.interactive-text {

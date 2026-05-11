@@ -88,6 +88,9 @@
 		@apply bg-white/40 backdrop-blur-3xl backdrop-saturate-[1.8] dark:bg-black/40;
 		@apply shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)];
 		@apply hover:-translate-y-2 hover:border-white/60 hover:bg-white/60 hover:shadow-xl dark:hover:border-white/20 dark:hover:bg-white/10;
+
+		/* Magic fix: Centers the 3rd card on 2-column layouts (between sm and lg breakpoints) */
+		@apply sm:max-lg:last:col-span-2 sm:max-lg:last:w-[calc(50%-0.5rem)] sm:max-lg:last:justify-self-center;
 	}
 
 	.icon-wrapper {
