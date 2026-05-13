@@ -40,16 +40,18 @@
 <svelte:window bind:innerWidth={width} bind:innerHeight={height} onmousemove={handleMouseMove} />
 
 <div
-	class="pointer-events-none fixed top-0 left-0 -z-10 h-[100lvh] w-full overflow-hidden bg-background"
+	class="pointer-events-none fixed top-0 left-0 -z-10 h-lvh w-full overflow-hidden bg-background"
 	style="perspective: 1000px;"
 >
-	<div class="absolute inset-0" style:transform style="transform-style: preserve-3d;">
+	<div class="absolute inset-0 h-lvh" style:transform style="transform-style: preserve-3d;">
 		<div class="blob blob-orange-1"></div>
 		<div class="blob blob-orange-2"></div>
 		<div class="blob blob-orange-3"></div>
 	</div>
 
-	<div class="grain-bg pointer-events-none absolute inset-0 opacity-[0.25] mix-blend-overlay"></div>
+	<div
+		class="grain-bg pointer-events-none absolute inset-0 h-lvh opacity-[0.25] mix-blend-overlay"
+	></div>
 </div>
 
 <style lang="postcss">

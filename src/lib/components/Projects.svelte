@@ -11,7 +11,7 @@
 		},
 		{
 			title: 'iPELiNT',
-			description: 'Created a patent classification model using TensorFlow and Keras',
+			description: 'Created patent classification models using TensorFlow and Keras',
 			link: 'https://www.ipelint.com/',
 			categories: ['Web', 'Database', 'AI/ML']
 		},
@@ -41,13 +41,13 @@
 		},
 		{
 			title: 'Discord Bot Maker',
-			description: 'Python library for creating Discord bots',
+			description: 'Pypi library for creating Discord bots',
 			link: 'https://github.com/dehadeaaryan/discord-bot-maker',
 			categories: ['Python', 'Library']
 		},
 		{
 			title: 'Music.www',
-			description: 'Play any song with extra controls',
+			description: 'Play any song on the internet with extra controls',
 			link: 'https://github.com/dehadeaaryan/music-www',
 			categories: ['Python', 'Database', 'Utilities']
 		},
@@ -59,25 +59,25 @@
 		},
 		{
 			title: 'Quacker Bot',
-			description: 'My favorite Discord bot',
+			description: 'My own Discord bot',
 			link: 'https://github.com/dehadeaaryan/quacker-bot-master',
 			categories: ['Python', 'Utilities']
 		},
 		{
 			title: 'Turtler',
-			description: 'Get started with Data Science',
+			description: 'Pypi library for beginners to started with Data Science',
 			link: 'https://github.com/dehadeaaryan/turtler',
 			categories: ['Python', 'Library']
 		},
 		{
 			title: 'Book Manager MySQL',
-			description: 'Python application to manage databases',
+			description: 'Python application to manage a book database using MySQL',
 			link: 'https://github.com/dehadeaaryan/book-manager-mysql',
 			categories: ['Python', 'Database']
 		},
 		{
 			title: 'Book Manager Mongo',
-			description: 'Python application to manage databases',
+			description: 'Python application to manage  a book database using MongoDB',
 			link: 'https://github.com/dehadeaaryan/book-manager-mongo',
 			categories: ['Python', 'Database']
 		},
@@ -89,61 +89,61 @@
 		},
 		{
 			title: 'Sudoku Solver',
-			description: 'A Sudoku Solver implemented in Python',
+			description: 'A Sudoku Solver implemented in Java',
 			link: 'https://github.com/dehadeaaryan/sudoku-solver',
 			categories: ['Java', 'Utilities']
 		},
 		{
 			title: 'Maze Solver',
-			description: 'Maze solver project for data structures',
+			description: 'Maze solver implemented in Java',
 			link: 'https://github.com/dehadeaaryan/maze-solver',
 			categories: ['Java', 'Utilities']
 		},
 		{
 			title: 'Line Text Editor',
-			description: 'Text editor created in Java',
+			description: 'Line text editor created in Java',
 			link: 'https://github.com/dehadeaaryan/line-text-editor',
 			categories: ['Java', 'Utilities']
 		},
 		{
 			title: 'TCU Utils',
-			description: 'Miscellaneous utilities for students',
+			description: 'Miscellaneous utilities for TCU students',
 			link: 'https://github.com/dehadeaaryan/tcu-utils',
 			categories: ['Web', 'Utilities']
 		},
 		{
 			title: 'Pygame Builder',
-			description: 'Python library to create games',
+			description: 'Pypi library to create games',
 			link: 'https://github.com/dehadeaaryan/pygame-builder',
 			categories: ['Python', 'Library']
 		},
 		{
 			title: 'ASL to English',
-			description: 'Python project for converting American Sign Language to English text.',
+			description: 'Python ML project for converting American Sign Language to English text.',
 			link: 'https://github.com/dehadeaaryan/asl-to-english',
 			categories: ['Python', 'AI/ML']
 		},
 		{
 			title: 'Tank War Game',
-			description: '2D action game inspired by Battle City',
+			description: '2D action game written in Java',
 			link: 'https://github.com/dehadeaaryan/tank-war-game',
 			categories: ['Java']
 		},
 		{
 			title: 'Campus Concierge',
-			description: 'Concierge platform for campus services',
+			description: 'Concierge platform for campus housing services',
 			link: 'https://github.com/dehadeaaryan/campus-concierge',
 			categories: ['Web', 'Utilities']
 		},
 		{
-			title: 'F1 Client',
-			description: 'API client for live Formula 1 data',
+			title: 'F1Stats',
+			description: 'API client for Formula 1 race results and statistics',
 			link: 'http://github.com/dehadeaaryan/f1-client',
 			categories: ['Web', 'Utilities']
 		},
 		{
 			title: 'Twitter Client',
-			description: 'iOS app written in Swift for Twitter',
+			description: 'iOS Twitter client written in Swift',
 			link: 'https://github.com/dehadeaaryan/ios-twitter',
 			categories: ['iOS']
 		},
@@ -167,7 +167,7 @@
 		},
 		{
 			title: 'Rabbit Fox Island',
-			description: 'C-based game project with MIT License',
+			description: 'C-based island simulation using Parallel Computing',
 			link: 'https://github.com/dehadeaaryan/rabbit-fox-island',
 			categories: ['C', 'Parallel Computing']
 		},
@@ -179,13 +179,13 @@
 		},
 		{
 			title: 'AaryanDehade.me',
-			description: 'My personal website',
+			description: 'My older personal website',
 			link: 'https://github.com/dehadeaaryan/aaryandehade-portfolio',
 			categories: ['Web']
 		},
 		{
 			title: 'ai.tcu.edu',
-			description: 'Application for TCU AI',
+			description: 'Application for TCU AI labs',
 			link: 'https://github.com/dehadeaaryan/tcu-ai',
 			categories: ['Web']
 		},
@@ -204,7 +204,7 @@
 		'F1 Stats',
 		'TCU Utils',
 		'Campus Concierge',
-		'F1 Client',
+		'F1Stats',
 		'Hogwarts Artifacts Online',
 		'AaryanDehade.me',
 		'ai.tcu.edu'
