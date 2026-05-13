@@ -65,7 +65,7 @@
 		},
 		{
 			title: 'Turtler',
-			description: 'Pypi library for beginners to started with Data Science',
+			description: 'Pypi library for beginners to get started with Data Science',
 			link: 'https://github.com/dehadeaaryan/turtler',
 			categories: ['Python', 'Library']
 		},

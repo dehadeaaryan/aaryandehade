@@ -41,9 +41,9 @@
 
 <div
 	class="pointer-events-none fixed top-0 left-0 -z-10 h-lvh w-full overflow-hidden bg-background"
-	style="perspective: 1000px;"
+	style=""
 >
-	<div class="absolute inset-0 h-lvh" style:transform style="transform-style: preserve-3d;">
+	<div class="absolute inset-0 h-lvh" style:transform style="">
 		<div class="blob blob-orange-1"></div>
 		<div class="blob blob-orange-2"></div>
 		<div class="blob blob-orange-3"></div>
