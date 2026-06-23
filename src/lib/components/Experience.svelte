@@ -37,7 +37,20 @@
 			company: 'Apple',
 			link: 'https://www.apple.com',
 			title: 'Software Development Engineer in Test',
-			dates: 'July 2025 - Present',
+			dates: 'June 2026 - Present',
+			description: [
+				'Designing and automating robust Maps UI test cases for Android using Espresso and Jetpack Compose, focusing on flake reduction and overall test reliability.',
+				'Owning testing features and collaborating closely with cross-functional Android development teams to improve application testability, triage failures, and solve complex automation challenges.',
+				'Building and maintaining modern, scalable automation frameworks across app, SDK, and API levels to establish comprehensive CI readiness.',
+				'Developing stable automation patterns—such as reliable selectors and synchronization architectures—and contributing to internal documentation to ensure long-term maintainability.'
+			],
+			logo: appleLogo
+		},
+		{
+			company: 'Apple',
+			link: 'https://www.apple.com',
+			title: 'Software Development Engineer in Test',
+			dates: 'July 2025 - May 2026',
 			description: [
 				'Designed and automated functional, end-to-end UI, and API tests for the Apple Maps Data platform, adding 70+ targeted regression tests to strengthen coverage of critical Places data workflows.',
 				'Enhanced an internal triage web portal using Python and JavaScript, adding multiple diagnostic tools and improving an existing scheduler system to make system health and test results 40% faster to access.',
