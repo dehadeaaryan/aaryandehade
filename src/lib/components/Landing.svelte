@@ -11,7 +11,7 @@
 		<a
 			href="https://www.google.com/maps/place/San+Francisco,+CA/@37.7577,-122.4376,12z/data=!3m1!4b1!4m6!3m5!1s0x80859a6d00690021:0x4a501367f076adff!8m2!3d37.7749295!4d-122.4194155!16zL20vMGQ2bHA?entry=ttu&g_ep=EgoyMDI2MDUwNi4wIKXMDSoASAFQAw%3D%3D"
 		>
-			<MapPin size={16} strokeWidth={2} /> Austin, TX
+			<MapPin size={16} strokeWidth={2} /> Bay Area, CA
 		</a>
 		<a href="https://www.google.com/maps/place/Vadodara">
 			<House size={16} strokeWidth={2} /> Vadodara, India
