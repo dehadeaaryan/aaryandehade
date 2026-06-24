@@ -114,26 +114,13 @@
 	}
 
 	#mobile-nav :global([data-radix-navigation-menu-trigger]) {
-		@apply inline-flex h-10 w-10 items-center justify-center rounded-full border-none bg-transparent p-0 transition-all duration-300;
+		@apply inline-flex h-10 w-10 items-center justify-center rounded-full border-none bg-transparent p-0 transition-all;
 
 		/* Liquid Glass Hover */
-		@apply hover:scale-105 hover:bg-white/20 hover:text-orange hover:shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_4px_12px_rgb(0,0,0,0.05)];
-		@apply dark:hover:bg-white/10 dark:hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_4px_12px_rgb(0,0,0,0.3)];
+		@apply hover:scale-105 hover:bg-white/80 hover:text-orange hover:shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_4px_12px_rgb(0,0,0,0.05)];
+		@apply dark:hover:bg-white/80 dark:hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_4px_12px_rgb(0,0,0,0.3)];
 
-		@apply focus:bg-white/20 focus:text-orange focus:outline-none;
-	}
-
-	#mobile-nav :global([data-radix-navigation-menu-trigger] > svg:not(:first-child)) {
-		display: none !important;
-	}
-
-	#mobile-nav :global([data-radix-navigation-menu-content]) {
-		@apply mt-2 overflow-hidden rounded-xl p-1;
-		/* Replicate header's dynamic glass for content menu */
-		@apply bg-white/10 dark:bg-black/10;
-		@apply backdrop-blur-lg backdrop-saturate-[1.5];
-		@apply border border-white/20 dark:border-white/10;
-		@apply shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)];
+		@apply focus:bg-white/80 focus:text-orange focus:outline-none;
 	}
 
 	#mobile-nav :global(ul) {
@@ -141,16 +128,16 @@
 	}
 
 	#mobile-nav :global(ul li a div) {
-		@apply text-sm leading-none font-medium;
+		@apply text-base leading-none font-bold; /* Larger, bolder text for mobile tap targets */
 	}
 
 	#mobile-nav :global(ul li a) {
-		@apply block rounded-md p-3 leading-none no-underline transition-all duration-300 outline-none select-none;
+		@apply block rounded-xl p-4 leading-none text-foreground no-underline transition-all outline-none select-none;
 
-		/* Liquid Glass Hover: Slightly smaller scale bump for dropdown items */
-		@apply hover:scale-[1.02] hover:bg-white/20 hover:text-orange hover:shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_4px_12px_rgb(0,0,0,0.05)];
+		/* Liquid Glass Hover: Soft scale, light up inner rim */
+		@apply hover:scale-[1.02] hover:bg-white/30 hover:text-orange hover:shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_4px_12px_rgb(0,0,0,0.05)];
 		@apply dark:hover:bg-white/10 dark:hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_4px_12px_rgb(0,0,0,0.3)];
 
-		@apply focus:bg-white/20 focus:text-orange;
+		@apply focus:bg-white/30 focus:text-orange;
 	}
 </style>

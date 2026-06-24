@@ -2,7 +2,7 @@
 	import { House, MapPin } from '@lucide/svelte';
 </script>
 
-<section id="home" class="relative z-0 overflow-hidden">
+<section id="home" class="relative z-0">
 	<div class="absolute -top-40 -z-10 h-96 w-96 rounded-full bg-blue-500/20 blur-3xl"></div>
 
 	<h1 class="interactive-text">Aaryan Dehade</h1>
