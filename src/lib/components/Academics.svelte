@@ -233,11 +233,24 @@
 		background: radial-gradient(circle 800px at 50% -20%, rgba(255, 165, 0, 0.12), transparent 70%);
 	}
 
-	/* Interactive Navigation Buttons */
+	/* Interactive Navigation Buttons (Liquid Glass) */
 	.nav-button {
 		@apply flex h-12 w-12 cursor-pointer items-center justify-center rounded-full text-foreground transition-all duration-300;
-		@apply border border-white/40 bg-white/30 shadow-md backdrop-blur-xl dark:border-white/10 dark:bg-black/40;
-		@apply hover:scale-110 hover:border-white/60 hover:bg-white/60 hover:text-orange dark:hover:border-white/20 dark:hover:bg-white/20;
+
+		/* Base Liquid Glass */
+		@apply border border-white/30 bg-white/10 backdrop-blur-xl backdrop-saturate-[1.5];
+		@apply dark:border-white/10 dark:bg-black/20;
+
+		/* Inner rim light + outer soft drop shadow */
+		@apply shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_8px_30px_rgb(0,0,0,0.1)];
+		@apply dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgb(0,0,0,0.3)];
+
+		/* Hover physics: Float, intensify inner light, keep translucent */
+		@apply hover:scale-110 hover:border-white/50 hover:bg-white/20 hover:text-orange;
+		@apply dark:hover:border-white/30 dark:hover:bg-white/10;
+		@apply hover:shadow-[inset_0_2px_8px_rgba(255,255,255,0.7),0_12px_40px_rgb(0,0,0,0.15)];
+		@apply dark:hover:shadow-[inset_0_1px_4px_rgba(255,255,255,0.3),0_12px_40px_rgb(0,0,0,0.5)];
+
 		@apply disabled:pointer-events-none disabled:opacity-30;
 	}
 </style>

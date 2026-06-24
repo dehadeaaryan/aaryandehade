@@ -7,7 +7,7 @@
 @plugin '@tailwindcss/typography';
 
 :root {
-    --background: #E9E3DF;
+    --background: #cfd5c5;
     --foreground: #000000;
     --orange: #FF7A30;
     --blue: #465C88;
@@ -153,14 +153,16 @@
 
 @layer base {
     * {
-        @apply border-border outline-ring/50;
+        border-color: var(--color-border);
+        outline-color: color-mix(in srgb, var(--color-ring) 50%, transparent);
     }
 
     body {
-        @apply select-none text-foreground;
+        user-select: none;
+        color: var(--color-foreground);
     }
 
     html {
-        @apply font-sans;
+        font-family: var(--font-sans);
     }
 }

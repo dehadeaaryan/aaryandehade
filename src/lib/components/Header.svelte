@@ -24,7 +24,9 @@
 					<NavigationMenu.List>
 						{#each mainLinks as link (link.name)}
 							<NavigationMenu.Item>
-								<NavigationMenu.Link href={link.href}>{link.name}</NavigationMenu.Link>
+								<NavigationMenu.Link href={link.href}>
+									{link.name}
+								</NavigationMenu.Link>
 							</NavigationMenu.Item>
 						{/each}
 					</NavigationMenu.List>
@@ -68,16 +70,21 @@
 
 	#header-container {
 		@apply mx-auto flex max-w-6xl items-center justify-between rounded-full px-8 py-4;
-		@apply bg-white/30 dark:bg-black/30;
-		@apply backdrop-blur-md backdrop-saturate-[1.8];
-		@apply border border-white/40 dark:border-white/10;
+		/* Dynamic glass effect */
+		@apply bg-white/10 dark:bg-black/10;
+		@apply backdrop-blur-lg backdrop-saturate-[1.5];
+		@apply border border-white/20 dark:border-white/10;
 		@apply shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)];
 	}
 
 	#home-link {
-		@apply inline-flex h-10 w-max items-center justify-center rounded-full px-4 py-2 text-lg font-black tracking-tighter transition-colors;
-		@apply hover:bg-orange/20 hover:text-orange dark:hover:bg-orange/30;
-		@apply focus:bg-orange/20 focus:text-orange focus:outline-none disabled:pointer-events-none disabled:opacity-50;
+		@apply inline-flex h-10 w-max items-center justify-center rounded-full px-4 py-2 text-lg font-black tracking-tighter transition-all duration-300;
+
+		/* Liquid Glass Hover: Scale up, inner rim light, soft translucent fill */
+		@apply hover:scale-105 hover:bg-white/20 hover:text-orange hover:shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_4px_12px_rgb(0,0,0,0.05)];
+		@apply dark:hover:bg-white/10 dark:hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_4px_12px_rgb(0,0,0,0.3)];
+
+		@apply focus:bg-white/20 focus:text-orange focus:outline-none disabled:pointer-events-none disabled:opacity-50;
 	}
 
 	#nav-container {
@@ -93,32 +100,39 @@
 	}
 
 	#desktop-nav :global(a) {
-		@apply inline-flex h-10 w-max items-center justify-center rounded-full px-4 py-2 text-sm font-bold transition-colors;
-		@apply hover:bg-orange/20 hover:text-orange dark:hover:bg-orange/30;
-		@apply focus:bg-orange/20 focus:text-orange focus:outline-none disabled:pointer-events-none disabled:opacity-50;
+		@apply inline-flex h-10 w-max items-center justify-center rounded-full px-4 py-2 text-sm font-bold transition-all duration-300;
+
+		/* Liquid Glass Hover */
+		@apply hover:scale-105 hover:bg-white/20 hover:text-orange hover:shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_4px_12px_rgb(0,0,0,0.05)];
+		@apply dark:hover:bg-white/10 dark:hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_4px_12px_rgb(0,0,0,0.3)];
+
+		@apply focus:bg-white/20 focus:text-orange focus:outline-none disabled:pointer-events-none disabled:opacity-50;
 	}
 
 	#mobile-nav {
 		@apply md:hidden;
 	}
 
-	/* Transform the mobile trigger into a perfect circle hover target to match the other icons */
 	#mobile-nav :global([data-radix-navigation-menu-trigger]) {
-		@apply inline-flex h-10 w-10 items-center justify-center rounded-full border-none bg-transparent p-0 shadow-none transition-colors;
-		@apply hover:bg-orange/20 hover:text-orange dark:hover:bg-orange/30;
-		@apply focus:bg-orange/20 focus:text-orange focus:outline-none;
+		@apply inline-flex h-10 w-10 items-center justify-center rounded-full border-none bg-transparent p-0 transition-all duration-300;
+
+		/* Liquid Glass Hover */
+		@apply hover:scale-105 hover:bg-white/20 hover:text-orange hover:shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_4px_12px_rgb(0,0,0,0.05)];
+		@apply dark:hover:bg-white/10 dark:hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_4px_12px_rgb(0,0,0,0.3)];
+
+		@apply focus:bg-white/20 focus:text-orange focus:outline-none;
 	}
 
-	/* Force hide the default chevron that shadcn appends to triggers */
 	#mobile-nav :global([data-radix-navigation-menu-trigger] > svg:not(:first-child)) {
 		display: none !important;
 	}
 
 	#mobile-nav :global([data-radix-navigation-menu-content]) {
 		@apply mt-2 overflow-hidden rounded-xl p-1;
-		@apply bg-white/30 dark:bg-black/30;
-		@apply backdrop-blur-md backdrop-saturate-[1.8];
-		@apply border border-white/40 dark:border-white/10;
+		/* Replicate header's dynamic glass for content menu */
+		@apply bg-white/10 dark:bg-black/10;
+		@apply backdrop-blur-lg backdrop-saturate-[1.5];
+		@apply border border-white/20 dark:border-white/10;
 		@apply shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)];
 	}
 
@@ -131,8 +145,12 @@
 	}
 
 	#mobile-nav :global(ul li a) {
-		@apply block rounded-md p-3 leading-none no-underline transition-colors outline-none select-none;
-		@apply hover:bg-orange/20 hover:text-orange dark:hover:bg-orange/30;
-		@apply focus:bg-orange/20 focus:text-orange;
+		@apply block rounded-md p-3 leading-none no-underline transition-all duration-300 outline-none select-none;
+
+		/* Liquid Glass Hover: Slightly smaller scale bump for dropdown items */
+		@apply hover:scale-[1.02] hover:bg-white/20 hover:text-orange hover:shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_4px_12px_rgb(0,0,0,0.05)];
+		@apply dark:hover:bg-white/10 dark:hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_4px_12px_rgb(0,0,0,0.3)];
+
+		@apply focus:bg-white/20 focus:text-orange;
 	}
 </style>

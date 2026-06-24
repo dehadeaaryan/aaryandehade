@@ -3,10 +3,18 @@
 	import type { CarouselAPI } from '$lib/components/ui/carousel/context.js';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import { crossfade } from 'svelte/transition';
+	import { cubicInOut } from 'svelte/easing';
 
 	import appleLogo from '$lib/assets/apple-logo.jpg';
 	import ipelintLogo from '$lib/assets/ipelint-logo.jpeg';
 	import qualcommLogo from '$lib/assets/qualcomm-logo.jpg';
+
+	// Set up the sliding animation for the tabs
+	const [send, receive] = crossfade({
+		duration: 400,
+		easing: cubicInOut
+	});
 
 	let api = $state<CarouselAPI>();
 	let current = $state(0);
@@ -54,7 +62,7 @@
 			description: [
 				'Designed and automated functional, end-to-end UI, and API tests for the Apple Maps Data platform, adding 70+ targeted regression tests to strengthen coverage of critical Places data workflows.',
 				'Enhanced an internal triage web portal using Python and JavaScript, adding multiple diagnostic tools and improving an existing scheduler system to make system health and test results 40% faster to access.',
-				'Built AI agents and reusable skills to generate test cases from test plan links, reducing manual test authoring time by ~50%',
+				'Built AI agents and reusable skills to generate test cases from test plan links, reducing manual test authoring time by ~50%.',
 				'Collaborated with international and cross-functional teams to deliver automation and quality targets.'
 			],
 			logo: appleLogo
@@ -188,14 +196,27 @@
 				<div class="tabs-container" role="tablist" aria-label="Experience slides">
 					{#each experiences as experience, i}
 						<button
-							class="glass-tab"
+							class="glass-tab group"
 							role="tab"
 							aria-selected={current === i}
 							aria-controls="experience-carousel"
-							class:active={current === i}
 							onclick={() => api?.scrollTo(i)}
 						>
-							{experience.company}
+							{#if current === i}
+								<div
+									class="active-pill"
+									in:receive={{ key: 'active-tab' }}
+									out:send={{ key: 'active-tab' }}
+								></div>
+							{/if}
+
+							<span
+								class="relative z-10 transition-colors duration-300"
+								class:text-orange={current === i}
+								class:group-hover:text-foreground={current !== i}
+							>
+								{experience.company}
+							</span>
 						</button>
 					{/each}
 				</div>
@@ -250,7 +271,6 @@
 
 	/* Carousel Structure */
 	.carousel-wrapper {
-		/* Bumped to max-w-5xl to account for the new inner padding */
 		@apply relative mb-6 flex w-full max-w-5xl flex-1 flex-col md:mb-8;
 	}
 
@@ -266,9 +286,8 @@
 		@apply flex min-w-0 basis-full flex-col pl-4;
 	}
 
-	/* Spacing Wrapper Fix */
 	.card-spacing-wrapper {
-		@apply flex h-full w-full flex-col px-2 py-8 md:px-4; /* Provides top/bottom breathing room for transforms & shadows */
+		@apply flex h-full w-full flex-col px-2 py-8 md:px-4;
 	}
 
 	/* Base Card Structure */
@@ -323,7 +342,6 @@
 		display: none;
 	}
 
-	/* Custom Stylish Bullet Points */
 	.card-description {
 		@apply flex flex-col gap-4;
 	}
@@ -337,15 +355,21 @@
 		@apply absolute top-[0.55rem] left-0 size-2 rounded-full bg-orange opacity-80;
 	}
 
-	/* Navigation */
+	/* Liquid Glass Navigation Buttons */
 	.custom-nav-button {
 		@apply absolute top-[50%] hidden h-14 w-14 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-foreground transition-all duration-300 md:flex;
-		@apply border border-white/40 bg-white/30 shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-black/40;
-		@apply hover:scale-110 hover:bg-white/60 hover:text-orange dark:hover:bg-white/20;
+		@apply border border-white/30 bg-white/10 backdrop-blur-xl backdrop-saturate-[1.5];
+		@apply dark:border-white/10 dark:bg-black/20;
+		@apply shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_8px_30px_rgb(0,0,0,0.1)];
+		@apply dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgb(0,0,0,0.3)];
+		@apply hover:scale-110 hover:border-white/50 hover:bg-white/20 hover:text-orange;
+		@apply dark:hover:border-white/30 dark:hover:bg-white/10;
+		@apply hover:shadow-[inset_0_2px_8px_rgba(255,255,255,0.7),0_12px_40px_rgb(0,0,0,0.15)];
+		@apply dark:hover:shadow-[inset_0_1px_4px_rgba(255,255,255,0.3),0_12px_40px_rgb(0,0,0,0.5)];
 	}
 
 	.left-btn {
-		@apply -left-2 xl:-left-12; /* Adjusted slightly inward to account for wider container */
+		@apply -left-2 xl:-left-12;
 	}
 
 	.right-btn {
@@ -356,8 +380,11 @@
 		@apply relative z-10 flex w-full justify-center px-2 pt-2 pb-4 md:px-4 md:pt-0;
 	}
 
+	/* Liquid Glass Track Container */
 	.tabs-container {
-		@apply flex max-w-full gap-1 overflow-x-auto rounded-full border border-white/20 bg-white/20 p-1.5 backdrop-blur-md dark:border-white/10 dark:bg-black/30;
+		@apply flex max-w-full gap-1 overflow-x-auto rounded-full p-1.5;
+		@apply border border-white/20 bg-white/10 shadow-inner backdrop-blur-xl backdrop-saturate-[1.5];
+		@apply dark:border-white/10 dark:bg-black/20;
 		scrollbar-width: none;
 		-ms-overflow-style: none;
 	}
@@ -366,11 +393,19 @@
 		display: none;
 	}
 
+	/* Base Tab: Added subtle glassy hover effect for inactive tabs */
 	.glass-tab {
-		@apply cursor-pointer rounded-full px-4 py-1.5 text-xs font-bold whitespace-nowrap text-foreground/60 transition-all duration-300 hover:text-foreground md:px-5 md:py-2 md:text-sm;
+		@apply relative z-0 cursor-pointer rounded-full px-4 py-1.5 text-xs font-bold whitespace-nowrap text-foreground/60 transition-all duration-300 md:px-5 md:py-2 md:text-sm;
+		@apply hover:bg-white/10 hover:shadow-[inset_0_1px_2px_rgba(255,255,255,0.3)];
+		@apply dark:hover:bg-white/5 dark:hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)];
+		-webkit-tap-highlight-color: transparent;
 	}
 
-	.glass-tab.active {
-		@apply bg-white/60 text-orange dark:bg-white/10;
+	/* The sliding physical glass piece (Active Tab) - Matched to Header Hover physics */
+	.active-pill {
+		@apply absolute inset-0 -z-10 rounded-full border border-white/30 bg-white/20;
+		@apply shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_4px_12px_rgb(0,0,0,0.05)];
+		@apply dark:border-white/10 dark:bg-white/10;
+		@apply dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_4px_12px_rgb(0,0,0,0.3)];
 	}
 </style>
