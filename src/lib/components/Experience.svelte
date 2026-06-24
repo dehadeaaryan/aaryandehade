@@ -395,7 +395,7 @@
 
 	/* Base Tab: Added subtle glassy hover effect for inactive tabs */
 	.glass-tab {
-		@apply relative z-0 cursor-pointer rounded-full px-4 py-1.5 text-xs font-bold whitespace-nowrap text-foreground/60 transition-all duration-300 md:px-5 md:py-2 md:text-sm;
+		@apply relative z-0 cursor-pointer rounded-full px-1 py-1.5 text-xs font-bold whitespace-nowrap text-foreground/60 transition-all duration-300 md:px-5 md:py-2 md:text-sm;
 		@apply hover:bg-white/10 hover:shadow-[inset_0_1px_2px_rgba(255,255,255,0.3)];
 		@apply dark:hover:bg-white/5 dark:hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)];
 		-webkit-tap-highlight-color: transparent;

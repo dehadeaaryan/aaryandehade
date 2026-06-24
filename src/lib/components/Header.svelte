@@ -34,7 +34,7 @@
 			</div>
 
 			<div id="mobile-nav">
-				<NavigationMenu.Root>
+				<NavigationMenu.Root viewport={false}>
 					<NavigationMenu.List>
 						<NavigationMenu.Item openOnHover={false}>
 							<NavigationMenu.Trigger>
@@ -65,7 +65,7 @@
 	@reference '../../routes/layout.css';
 
 	header {
-		@apply fixed top-0 z-50 w-full p-4 text-orange;
+		@apply fixed relative top-0 z-50 w-full p-4 text-orange;
 	}
 
 	#header-container {
@@ -113,14 +113,30 @@
 		@apply md:hidden;
 	}
 
-	#mobile-nav :global([data-radix-navigation-menu-trigger]) {
-		@apply inline-flex h-10 w-10 items-center justify-center rounded-full border-none bg-transparent p-0 transition-all;
+	#mobile-nav :global([data-slot='navigation-menu-trigger']) {
+		@apply inline-flex h-10 w-10 items-center justify-center rounded-full border-none bg-transparent p-0;
 
 		/* Liquid Glass Hover */
-		@apply hover:scale-105 hover:bg-white/80 hover:text-orange hover:shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_4px_12px_rgb(0,0,0,0.05)];
-		@apply dark:hover:bg-white/80 dark:hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_4px_12px_rgb(0,0,0,0.3)];
+		@apply hover:scale-105 hover:bg-white/20 hover:text-orange hover:shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_4px_12px_rgb(0,0,0,0.05)];
+		@apply dark:hover:bg-white/10 dark:hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_4px_12px_rgb(0,0,0,0.3)];
 
-		@apply focus:bg-white/80 focus:text-orange focus:outline-none;
+		@apply focus:text-orange focus:outline-none;
+	}
+
+	#mobile-nav :global([data-slot='navigation-menu-trigger'] > svg:not(:first-child)) {
+		display: none !important;
+	}
+
+	#mobile-nav :global([data-slot='navigation-menu-content']) {
+		@apply absolute right-auto left-auto mt-3 w-auto rounded-2xl p-2;
+
+		/* The Liquid Glass Core (Heavy frost to block out page content underneath) */
+		@apply border border-white/50 bg-orange-200 backdrop-blur-3xl backdrop-saturate-[1.8];
+		@apply dark:bg-orange-900;
+
+		/* Inner lighting + heavy outer drop shadow to make the menu float */
+		@apply shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_16px_40px_rgb(0,0,0,0.1)];
+		@apply dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_16px_40px_rgb(0,0,0,0.4)];
 	}
 
 	#mobile-nav :global(ul) {
@@ -132,7 +148,7 @@
 	}
 
 	#mobile-nav :global(ul li a) {
-		@apply block rounded-xl p-4 leading-none text-foreground no-underline transition-all outline-none select-none;
+		@apply block rounded-xl p-4 leading-none text-foreground no-underline outline-none select-none;
 
 		/* Liquid Glass Hover: Soft scale, light up inner rim */
 		@apply hover:scale-[1.02] hover:bg-white/30 hover:text-orange hover:shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_4px_12px_rgb(0,0,0,0.05)];
