@@ -6,6 +6,22 @@ import type { Handle } from '@sveltejs/kit';
 import { getTextDirection } from '$lib/paraglide/runtime';
 import { paraglideMiddleware } from '$lib/paraglide/server';
 
+const ALLOWED_ORIGINS = [
+	'https://aaryandehade.com',
+	'https://www.aaryandehade.com',
+	'http://localhost:5173'
+];
+
+const handleAllowedOrigins: Handle = async ({ event, resolve }) => {
+	const origin = event.request.headers.get('origin');
+	if (event.request.method === 'POST' && origin) {
+		if (!ALLOWED_ORIGINS.includes(origin)) {
+			return new Response('Forbidden: Cross-site POST request rejected.', { status: 403 });
+		}
+	}
+	return resolve(event);
+};
+
 const handleParaglide: Handle = ({ event, resolve }) =>
 	paraglideMiddleware(event.request, ({ request, locale }) => {
 		event.request = request;
@@ -29,4 +45,4 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
 	return svelteKitHandler({ event, resolve, auth, building });
 };
 
-export const handle: Handle = sequence(handleParaglide, handleBetterAuth);
+export const handle: Handle = sequence(handleAllowedOrigins, handleParaglide, handleBetterAuth);
