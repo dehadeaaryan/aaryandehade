@@ -5,6 +5,8 @@
 	import Experience from '$lib/components/Experience.svelte';
 	import Landing from '$lib/components/Landing.svelte';
 	import Projects from '$lib/components/Projects.svelte';
+
+	let { data } = $props();
 </script>
 
 <svelte:head>
@@ -15,10 +17,10 @@
 <Header />
 <main class="relative">
 	<Landing />
-	<Experience />
-	<Projects />
-	<Academics />
-	<Contact />
+	<Experience experiences={data?.experiences} />
+	<Projects projects={data?.projects} />
+	<Academics academics={data?.academics} />
+	<Contact contacts={data?.contacts} />
 </main>
 
 <style lang="postcss">

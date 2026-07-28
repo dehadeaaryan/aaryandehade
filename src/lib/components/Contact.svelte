@@ -2,26 +2,52 @@
 	import { HugeiconsIcon } from '@hugeicons/svelte';
 	import { MailIcon, GithubIcon, Linkedin01Icon } from '@hugeicons/core-free-icons';
 
-	const contacts = [
+	interface ContactItem {
+		id?: number;
+		name: string;
+		value: string;
+		link: string;
+		icon: string;
+	}
+
+	let { contacts = [] }: { contacts?: ContactItem[] } = $props();
+
+	const iconMap: Record<string, any> = {
+		mail: MailIcon,
+		github: GithubIcon,
+		linkedin: Linkedin01Icon
+	};
+
+	const defaultContacts = [
 		{
 			name: 'Email',
 			value: 'aaryanadehade@gmail.com',
 			link: 'mailto:aaryanadehade@gmail.com',
-			icon: MailIcon
+			iconComponent: MailIcon
 		},
 		{
 			name: 'GitHub',
 			value: '@dehadeaaryan',
 			link: 'https://github.com/dehadeaaryan',
-			icon: GithubIcon
+			iconComponent: GithubIcon
 		},
 		{
 			name: 'LinkedIn',
 			value: 'Aaryan Dehade',
 			link: 'https://linkedin.com/in/aaryandehade',
-			icon: Linkedin01Icon
+			iconComponent: Linkedin01Icon
 		}
 	];
+
+	const displayContacts = $derived.by(() => {
+		if (contacts && contacts.length > 0) {
+			return contacts.map((c) => ({
+				...c,
+				iconComponent: iconMap[c.icon] || MailIcon
+			}));
+		}
+		return defaultContacts;
+	});
 </script>
 
 <section id="contact">
@@ -35,7 +61,7 @@
 	</div>
 
 	<div class="contact-grid">
-		{#each contacts as contact}
+		{#each displayContacts as contact}
 			<a
 				href={contact.link}
 				target="_blank"
@@ -43,7 +69,7 @@
 				class="glass-contact-card group"
 			>
 				<div class="icon-wrapper">
-					<HugeiconsIcon icon={contact.icon} size={24} color="currentColor" />
+					<HugeiconsIcon icon={contact.iconComponent} size={24} color="currentColor" />
 				</div>
 
 				<div class="text-wrapper">

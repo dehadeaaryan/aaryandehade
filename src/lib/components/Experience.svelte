@@ -40,7 +40,19 @@
 		};
 	});
 
-	const experiences = [
+	interface ExperienceItem {
+		id?: number;
+		company: string;
+		link: string;
+		title: string;
+		dates: string;
+		description: string[];
+		logo: string;
+	}
+
+	let { experiences = [] }: { experiences?: ExperienceItem[] } = $props();
+
+	const fallbackExperiences: ExperienceItem[] = [
 		{
 			company: 'Apple',
 			link: 'https://www.apple.com',
@@ -104,6 +116,10 @@
 			logo: qualcommLogo
 		}
 	];
+
+	const displayExperiences = $derived(
+		experiences && experiences.length > 0 ? experiences : fallbackExperiences
+	);
 </script>
 
 <section id="experience">
@@ -129,7 +145,7 @@
 			>
 				<Carousel.Root setApi={(emblaApi) => (api = emblaApi)} class="carousel-root">
 					<Carousel.Content>
-						{#each experiences as experience}
+						{#each displayExperiences as experience}
 							<Carousel.Item class="carousel-item">
 								<div class="card-spacing-wrapper">
 									<div class="glass-card">
@@ -194,7 +210,7 @@
 
 			<div class="tabs-wrapper">
 				<div class="tabs-container" role="tablist" aria-label="Experience slides">
-					{#each experiences as experience, i}
+					{#each displayExperiences as experience, i}
 						<button
 							class="glass-tab group"
 							role="tab"

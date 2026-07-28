@@ -2,7 +2,16 @@
 	import Marquee from './ui/marquee/marquee.svelte';
 	import ProjectCard from './ProjectCard.svelte';
 
-	const allProjects = [
+	interface ProjectItem {
+		id?: number;
+		title: string;
+		description: string;
+		link: string;
+		categories: string[];
+		groupCategory?: string;
+	}
+
+	const allProjects: ProjectItem[] = [
 		{
 			title: 'DropThatClass',
 			description: 'Up-to-date class reviews for students',
@@ -197,49 +206,35 @@
 		}
 	];
 
-	const webAndFullStack = [
-		'DropThatClass',
-		'iPELiNT',
-		'SuperFrog Scheduler Frontend',
-		'F1 Stats',
-		'TCU Utils',
-		'Campus Concierge',
-		'F1Stats',
-		'Hogwarts Artifacts Online',
-		'AaryanDehade.me',
-		'ai.tcu.edu'
-	].map((title) => allProjects.find((p) => p.title === title)!);
+	let { projects = [] }: { projects?: ProjectItem[] } = $props();
 
-	const dataAndBackend = [
-		'SuperFrog Scheduler Backend',
-		'ASL to English',
-		'Book Manager MySQL',
-		'Book Manager Mongo',
-		'Turtler'
-	].map((title) => allProjects.find((p) => p.title === title)!);
+	const displayProjects = $derived(
+		projects && projects.length > 0 ? projects : allProjects
+	);
 
-	const systemsAndLogic = [
-		'Marie Simulator',
-		'Sudoku Solver',
-		'Maze Solver',
-		'Line Text Editor',
-		'Tank War Game',
-		'Parallel Computing',
-		'Rabbit Fox Island'
-	].map((title) => allProjects.find((p) => p.title === title)!);
+	const webAndFullStack = $derived(
+		displayProjects.filter(
+			(p) => p.groupCategory === 'webAndFullStack' || (!p.groupCategory && ['DropThatClass', 'iPELiNT', 'SuperFrog Scheduler Frontend', 'F1 Stats', 'TCU Utils', 'Campus Concierge', 'F1Stats', 'Hogwarts Artifacts Online', 'AaryanDehade.me', 'ai.tcu.edu'].includes(p.title))
+		)
+	);
 
-	const mobileAndTools = [
-		'JustDropIt',
-		'Discord Bot Maker',
-		'Music.www',
-		'Quacker Bot',
-		'Pygame Builder',
-		'Chess',
-		'Twitter Client',
-		'Parstagram',
-		'Calculator',
-		'More Projects'
-	].map((title) => allProjects.find((p) => p.title === title)!);
+	const dataAndBackend = $derived(
+		displayProjects.filter(
+			(p) => p.groupCategory === 'dataAndBackend' || (!p.groupCategory && ['SuperFrog Scheduler Backend', 'ASL to English', 'Book Manager MySQL', 'Book Manager Mongo', 'Turtler'].includes(p.title))
+		)
+	);
+
+	const systemsAndLogic = $derived(
+		displayProjects.filter(
+			(p) => p.groupCategory === 'systemsAndLogic' || (!p.groupCategory && ['Marie Simulator', 'Sudoku Solver', 'Maze Solver', 'Line Text Editor', 'Tank War Game', 'Parallel Computing', 'Rabbit Fox Island'].includes(p.title))
+		)
+	);
+
+	const mobileAndTools = $derived(
+		displayProjects.filter(
+			(p) => p.groupCategory === 'mobileAndTools' || (!p.groupCategory && ['JustDropIt', 'Discord Bot Maker', 'Music.www', 'Quacker Bot', 'Pygame Builder', 'Chess', 'Twitter Client', 'Parstagram', 'Calculator', 'More Projects'].includes(p.title)) || (!p.groupCategory && !webAndFullStack.includes(p) && !dataAndBackend.includes(p) && !systemsAndLogic.includes(p))
+		)
+	);
 </script>
 
 <section id="projects">

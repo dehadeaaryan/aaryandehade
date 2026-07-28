@@ -14,7 +14,27 @@
 		ChevronRight
 	} from '@lucide/svelte/icons';
 
-	const ACADEMIC_TIMELINE: ArcTimelineItem[] = [
+	interface AcademicItem {
+		id?: number;
+		year: string;
+		icon: string;
+		content: string;
+	}
+
+	let { academics = [] }: { academics?: AcademicItem[] } = $props();
+
+	const iconMap: Record<string, any> = {
+		graduationCap: graduationCapIcon,
+		school: schoolIcon,
+		briefcase: briefcaseIcon,
+		award: awardIcon,
+		mic: micIcon,
+		badgeCheck: badgeCheckIcon,
+		users: usersIcon,
+		star: starIcon
+	};
+
+	const defaultTimeline: ArcTimelineItem[] = [
 		{
 			time: '2021',
 			steps: [
@@ -89,15 +109,33 @@
 		}
 	];
 
+	const timelineData = $derived.by(() => {
+		if (academics && academics.length > 0) {
+			const years = Array.from(new Set(academics.map((a) => String(a.year)))).sort();
+			return years.map((yr) => ({
+				time: yr,
+				steps: academics
+					.filter((a) => String(a.year) === yr)
+					.map((a) => ({
+						icon: iconMap[a.icon] || graduationCapIcon,
+						content: a.content
+					}))
+			}));
+		}
+		return defaultTimeline;
+	});
+
 	// Create a flattened array of all steps to make navigation math easy
-	const allSteps: { time: string; stepIndex: number }[] = ACADEMIC_TIMELINE.flatMap((year) =>
-		year.steps.map((_, sIndex) => ({
-			time: String(year.time), // Ensure time is a string
-			stepIndex: sIndex
-		}))
+	const allSteps = $derived(
+		timelineData.flatMap((year) =>
+			year.steps.map((_, sIndex) => ({
+				time: String(year.time), // Ensure time is a string
+				stepIndex: sIndex
+			}))
+		)
 	);
 
-	// Track the active step (Start at the final 2025 step)
+	// Track the active step (Start at the final step)
 	let activeStep = $state({ time: '2025', stepIndex: 0 });
 
 	// Derive the current index to control the disabled state of the buttons
@@ -136,7 +174,7 @@
 			<ArcTimeline
 				bind:activeStep
 				class="text-foreground [--description-color:var(--foreground)] [--icon-active-color:var(--orange)] [--icon-inactive-color:var(--muted-foreground)] [--placeholder-line-color:var(--border)] [--step-line-active-color:var(--orange)] [--step-line-inactive-color:var(--border)] [--time-active-color:var(--foreground)] [--time-inactive-color:var(--muted-foreground)]"
-				data={ACADEMIC_TIMELINE}
+				data={timelineData}
 			/>
 		</div>
 
