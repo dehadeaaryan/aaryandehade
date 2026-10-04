@@ -1,42 +1,40 @@
-# sv
+# Aaryan Dehade's portfolio
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+SvelteKit portfolio with PostgreSQL-backed content and a Google-authenticated admin editor. Projects appear in an animated perspective grid on desktop and horizontal marquees on mobile, with a link to the live apps showcase.
 
-## Creating a project
+## Development
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```sh
-# create a new project
-npx sv create my-app
-```
-
-To recreate this project with the same configuration:
+Use Bun 1.3.11:
 
 ```sh
-# recreate this project
-bun x sv@0.15.1 create --template minimal --types ts --add prettier eslint tailwindcss="plugins:typography" sveltekit-adapter="adapter:node" drizzle="database:postgresql+postgresql:postgres.js+docker:yes" better-auth="demo:password" playwright vitest="usages:unit,component" mdsvex paraglide="languageTags:en, es, hi, mr, gu, zh, fr+demo:yes" mcp="ide:vscode,gemini,claude-code+setup:remote" storybook --install bun aaryandehade
+bun install --frozen-lockfile
+cp .env.example .env
+bun run dev
 ```
 
-## Developing
+Configure `DATABASE_URL`, `ORIGIN`, `BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `ADMIN_EMAIL`. Database configuration is required; there is no embedded credential or remote fallback. URL-encode special characters in database passwords.
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+```env
+DATABASE_URL="postgresql://USER:URL_ENCODED_PASSWORD@HOST:5432/DATABASE"
+```
+
+## Content
 
 ```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+bun run db:seed
+bun run db:update-projects
 ```
 
-## Building
+Seeding inserts missing records inside a transaction and preserves existing records and admin edits. The project update applies the curated descriptions and links to the four live apps and repairs the SuperFrog frontend link. It does not delete historical projects.
 
-To create a production version of your app:
+`src/lib/portfolio.json` is the public fallback snapshot. Update it when publishing content changes. Each public section is fetched concurrently and cached for 60 seconds per server process. Successful admin changes invalidate the local cache immediately; other replicas refresh within 60 seconds. During database outages each section uses its last successful result, or the bundled snapshot on a fresh process. An intentionally empty section stays empty. Authentication data is never cached here.
+
+## Validation and deployment
 
 ```sh
-npm run build
+bun run check
+bun run test:unit --run --project server
+bun run build
 ```
 
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+The Bun Dockerfile is at `src/lib/components/Dockerfile`; build with the repository root as its context. Set the production environment variables, expose port 3000, and run `bun run build/index.js`. Rotate the PostgreSQL password on the database, then update `DATABASE_URL` locally and in the deployment environment and redeploy.

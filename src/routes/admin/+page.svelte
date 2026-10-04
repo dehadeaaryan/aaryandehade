@@ -1,4 +1,10 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
+	import { enhance, applyAction } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
+	import type { SubmitFunction } from '@sveltejs/kit';
+	import type { PageProps } from './$types';
+	import ModeToggle from '$lib/components/ModeToggle.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import Edit3 from '@lucide/svelte/icons/edit-3';
@@ -13,13 +19,61 @@
 	import AlertCircle from '@lucide/svelte/icons/alert-circle';
 	import LogOut from '@lucide/svelte/icons/log-out';
 
-	let { data, form } = $props();
+	let { data, form }: PageProps = $props();
+
+	let pending = $state(false);
+	let feedback = $state<{ error?: string; message?: string } | null>(null);
+	let search = $state('');
+	const groupNames: Record<string, string> = {
+		webAndFullStack: 'Web & Full Stack',
+		dataAndBackend: 'Data & Backend',
+		systemsAndLogic: 'Systems & Logic',
+		mobileAndTools: 'Mobile & Tools'
+	};
+	const submit: SubmitFunction = ({ cancel }) => {
+		if (pending) {
+			cancel();
+			return;
+		}
+		pending = true;
+		feedback = null;
+		return async ({ result }) => {
+			try {
+				if (result.type === 'success') {
+					feedback = { message: String(result.data?.message || 'Changes saved.') };
+					activeModal = null;
+					await invalidateAll();
+				} else if (result.type === 'failure') {
+					feedback = { error: String(result.data?.error || 'Unable to save. Please try again.') };
+				} else if (result.type === 'error') {
+					feedback = {
+						error: 'Unable to complete the request. Your edits are still here; please try again.'
+					};
+				} else {
+					await applyAction(result);
+				}
+			} finally {
+				pending = false;
+			}
+		};
+	};
+	function showDialog(node: HTMLDialogElement) {
+		node.showModal();
+	}
 
 	let activeTab = $state<'experience' | 'projects' | 'academics' | 'contact'>('experience');
 
 	let user = $derived(data?.user);
 	let experiences = $derived(data?.experiences || []);
 	let projects = $derived(data?.projects || []);
+	let filteredProjects = $derived(
+		projects.filter((item) =>
+			[item.title, item.description, ...item.categories]
+				.join(' ')
+				.toLowerCase()
+				.includes(search.toLowerCase().trim())
+		)
+	);
 	let academics = $derived(data?.academics || []);
 	let contacts = $derived(data?.contacts || []);
 
@@ -48,7 +102,7 @@
 		activeModal = 'experience';
 	}
 
-	function openEditExp(item: any) {
+	function openEditExp(item: PageProps['data']['experiences'][number]) {
 		expId = item.id;
 		expCompany = item.company;
 		expTitle = item.title;
@@ -56,7 +110,9 @@
 		expLink = item.link;
 		expLogo = item.logo;
 		expSortOrder = item.sortOrder;
-		expDescription = Array.isArray(item.description) ? [...item.description] : [String(item.description)];
+		expDescription = Array.isArray(item.description)
+			? [...item.description]
+			: [String(item.description)];
 		activeModal = 'experience';
 	}
 
@@ -80,7 +136,7 @@
 		activeModal = 'project';
 	}
 
-	function openEditProj(item: any) {
+	function openEditProj(item: PageProps['data']['projects'][number]) {
 		projId = item.id;
 		projTitle = item.title;
 		projDescription = item.description;
@@ -107,7 +163,7 @@
 		activeModal = 'academic';
 	}
 
-	function openEditAcad(item: any) {
+	function openEditAcad(item: PageProps['data']['academics'][number]) {
 		acadId = item.id;
 		acadYear = item.year;
 		acadIcon = item.icon;
@@ -134,7 +190,7 @@
 		activeModal = 'contact';
 	}
 
-	function openEditCont(item: any) {
+	function openEditCont(item: PageProps['data']['contacts'][number]) {
 		contId = item.id;
 		contName = item.name;
 		contValue = item.value;
@@ -145,45 +201,58 @@
 	}
 
 	function closeModal() {
+		if (pending) return;
+		feedback = null;
 		activeModal = null;
 	}
 </script>
 
 <svelte:head>
 	<title>Admin Dashboard | Aaryan Dehade</title>
+	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
-<div class="min-h-screen bg-background text-foreground transition-colors duration-300">
+<div class="admin-page min-h-screen bg-background text-foreground transition-colors duration-300">
 	<!-- Background Glow -->
 	<div class="pointer-events-none fixed inset-0 z-0 opacity-30 dark:opacity-20">
-		<div class="absolute -top-40 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-orange/20 blur-[120px]"></div>
+		<div
+			class="absolute -top-40 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-orange/20 blur-[120px]"
+		></div>
 	</div>
 
 	<!-- Navigation Header -->
-	<header class="sticky top-0 z-40 border-b border-white/20 bg-white/40 backdrop-blur-xl dark:border-white/10 dark:bg-black/40">
+	<header
+		class="sticky top-0 z-40 border-b border-white/20 bg-white/40 backdrop-blur-xl dark:border-white/10 dark:bg-black/40"
+	>
 		<div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
 			<div class="flex items-center gap-3">
 				<a
-					href="/"
+					href={resolve('/')}
 					class="flex cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/20 px-3 py-1.5 text-xs font-semibold text-foreground/80 transition hover:bg-white/40 dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/20"
 				>
 					<ArrowLeft size={16} />
 					<span>Back to Site</span>
 				</a>
 				<span class="h-4 w-px bg-foreground/20"></span>
-				<h1 class="text-lg font-bold tracking-tight">Portfolio Admin</h1>
+				<a href={resolve('/')} class="admin-brand"
+					><img src="/apple-touch-icon.png" width="36" height="36" alt="" /><span
+						>Aaryan<span class="text-orange">.</span><small>Portfolio admin</small></span
+					></a
+				>
 			</div>
 
 			<div class="flex items-center gap-3">
+				<ModeToggle />
 				{#if user}
 					<span class="hidden text-xs font-semibold text-foreground/60 sm:inline">
 						{user.email}
 					</span>
 				{/if}
 
-				<form method="POST" action="?/signOut">
+				<form use:enhance={submit} method="POST" action="?/signOut">
 					<button
 						type="submit"
+						disabled={pending}
 						class="flex cursor-pointer items-center gap-1.5 rounded-full border border-white/20 bg-white/20 px-3.5 py-2 text-xs font-bold text-foreground/80 transition hover:bg-red-500/10 hover:text-red-500 dark:border-white/10 dark:bg-white/10"
 					>
 						<LogOut size={16} />
@@ -197,49 +266,91 @@
 	<!-- Main Body Container -->
 	<main class="relative z-10 mx-auto max-w-6xl px-4 py-8 sm:px-6">
 		<!-- Alerts -->
-		{#if form?.error}
-			<div class="mb-6 flex items-center gap-3 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm font-medium text-red-500 backdrop-blur-md">
-				<AlertCircle size={20} class="shrink-0" />
-				<span>{form.error}</span>
-			</div>
-		{/if}
+		<div role="status" aria-live="polite">
+			{#if !activeModal && (feedback?.error || form?.error)}
+				<div
+					class="mb-6 flex items-center gap-3 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm font-medium text-red-500 backdrop-blur-md"
+				>
+					<AlertCircle size={20} class="shrink-0" />
+					<span>{feedback?.error || form?.error}</span>
+				</div>
+			{/if}
 
-		{#if form?.success}
-			<div class="mb-6 flex items-center gap-3 rounded-2xl border border-green-500/30 bg-green-500/10 p-4 text-sm font-medium text-green-500 backdrop-blur-md">
-				<Check size={20} class="shrink-0" />
-				<span>{form.message}</span>
-			</div>
-		{/if}
+			{#if !activeModal && (feedback?.message || form?.success)}
+				<div
+					class="mb-6 flex items-center gap-3 rounded-2xl border border-green-500/30 bg-green-500/10 p-4 text-sm font-medium text-green-500 backdrop-blur-md"
+				>
+					<Check size={20} class="shrink-0" />
+					<span>{feedback?.message || form?.message}</span>
+				</div>
+			{/if}
 
+			<div class="admin-intro">
+				<span class="text-orange">Your workspace</span>
+				<h1>Manage your portfolio</h1>
+				<p>Keep your projects, experience, and contact details up to date.</p>
+			</div>
+		</div>
 		<!-- Admin Section Tabs -->
-		<div class="mb-8 flex overflow-x-auto rounded-full border border-white/20 bg-white/20 p-1.5 backdrop-blur-xl dark:border-white/10 dark:bg-black/20">
+		<div
+			aria-label="Portfolio sections"
+			class="admin-tabs mb-8 flex overflow-x-auto rounded-full border border-white/20 bg-white/20 p-1.5 backdrop-blur-xl dark:border-white/10 dark:bg-black/20"
+		>
 			<button
-				onclick={() => (activeTab = 'experience')}
-				class="flex cursor-pointer items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold transition duration-300 {activeTab === 'experience' ? 'bg-orange text-white shadow-lg' : 'text-foreground/70 hover:text-foreground hover:bg-white/10'}"
+				aria-pressed={activeTab === 'experience'}
+				onclick={() => {
+					activeTab = 'experience';
+					feedback = null;
+				}}
+				class="flex cursor-pointer items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold transition duration-300 {activeTab ===
+				'experience'
+					? 'bg-orange text-white shadow-lg'
+					: 'text-foreground/70 hover:bg-white/10 hover:text-foreground'}"
 			>
 				<Briefcase size={16} />
 				<span>Experience ({experiences.length})</span>
 			</button>
 
 			<button
-				onclick={() => (activeTab = 'projects')}
-				class="flex cursor-pointer items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold transition duration-300 {activeTab === 'projects' ? 'bg-orange text-white shadow-lg' : 'text-foreground/70 hover:text-foreground hover:bg-white/10'}"
+				aria-pressed={activeTab === 'projects'}
+				onclick={() => {
+					activeTab = 'projects';
+					feedback = null;
+				}}
+				class="flex cursor-pointer items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold transition duration-300 {activeTab ===
+				'projects'
+					? 'bg-orange text-white shadow-lg'
+					: 'text-foreground/70 hover:bg-white/10 hover:text-foreground'}"
 			>
 				<FolderGit2 size={16} />
 				<span>Projects ({projects.length})</span>
 			</button>
 
 			<button
-				onclick={() => (activeTab = 'academics')}
-				class="flex cursor-pointer items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold transition duration-300 {activeTab === 'academics' ? 'bg-orange text-white shadow-lg' : 'text-foreground/70 hover:text-foreground hover:bg-white/10'}"
+				aria-pressed={activeTab === 'academics'}
+				onclick={() => {
+					activeTab = 'academics';
+					feedback = null;
+				}}
+				class="flex cursor-pointer items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold transition duration-300 {activeTab ===
+				'academics'
+					? 'bg-orange text-white shadow-lg'
+					: 'text-foreground/70 hover:bg-white/10 hover:text-foreground'}"
 			>
 				<GraduationCap size={16} />
 				<span>Academics ({academics.length})</span>
 			</button>
 
 			<button
-				onclick={() => (activeTab = 'contact')}
-				class="flex cursor-pointer items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold transition duration-300 {activeTab === 'contact' ? 'bg-orange text-white shadow-lg' : 'text-foreground/70 hover:text-foreground hover:bg-white/10'}"
+				aria-pressed={activeTab === 'contact'}
+				onclick={() => {
+					activeTab = 'contact';
+					feedback = null;
+				}}
+				class="flex cursor-pointer items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold transition duration-300 {activeTab ===
+				'contact'
+					? 'bg-orange text-white shadow-lg'
+					: 'text-foreground/70 hover:bg-white/10 hover:text-foreground'}"
 			>
 				<Mail size={16} />
 				<span>Contact ({contacts.length})</span>
@@ -253,7 +364,9 @@
 			<div class="mb-6 flex items-center justify-between">
 				<div>
 					<h2 class="text-2xl font-black tracking-tight">Experience</h2>
-					<p class="text-xs text-foreground/60">Career positions, dates, bullet points & company details.</p>
+					<p class="text-xs text-foreground/60">
+						Career positions, dates, bullet points & company details.
+					</p>
 				</div>
 				<button
 					onclick={openAddExp}
@@ -266,29 +379,57 @@
 
 			<div class="grid gap-6 md:grid-cols-2">
 				{#each experiences as item (item.id)}
-					<div class="flex flex-col justify-between rounded-3xl border border-white/30 bg-white/40 p-6 shadow-xl backdrop-blur-2xl dark:border-white/10 dark:bg-black/30">
+					<div
+						class="flex flex-col justify-between rounded-3xl border border-white/30 bg-white/40 p-6 shadow-xl backdrop-blur-2xl dark:border-white/10 dark:bg-black/30"
+					>
 						<div>
 							<div class="mb-4 flex items-start justify-between gap-4">
 								<div class="flex items-center gap-3">
-									<img src={item.logo} alt={item.company} class="size-12 rounded-xl object-contain bg-white p-1 shadow-sm" />
+									<img
+										src={item.logo}
+										alt={item.company}
+										class="size-12 rounded-xl bg-white object-contain p-1 shadow-sm"
+									/>
 									<div>
 										<h3 class="text-lg font-bold">{item.title}</h3>
-										<a href={item.link} target="_blank" class="cursor-pointer text-xs font-bold text-orange hover:underline">{item.company}</a>
+										<a
+											href={item.link}
+											target="_blank"
+											rel="external noopener noreferrer"
+											class="cursor-pointer text-xs font-bold text-orange hover:underline"
+											>{item.company}</a
+										>
 									</div>
 								</div>
-								<span class="rounded-full bg-orange/10 px-2.5 py-0.5 text-[10px] font-bold text-orange">{item.dates}</span>
+								<span
+									class="rounded-full bg-orange/10 px-2.5 py-0.5 text-[10px] font-bold text-orange"
+									>{item.dates}</span
+								>
 							</div>
 							<ul class="mb-4 flex flex-col gap-1.5 pl-2">
-								{#each item.description as pt}
-									<li class="relative pl-3 text-xs text-foreground/80"><span class="absolute left-0 top-1.5 size-1.5 rounded-full bg-orange"></span>{pt}</li>
+								{#each item.description as pt, index (index)}
+									<li class="relative pl-3 text-xs text-foreground/80">
+										<span class="absolute top-1.5 left-0 size-1.5 rounded-full bg-orange"
+										></span>{pt}
+									</li>
 								{/each}
 							</ul>
 						</div>
 						<div class="flex justify-end gap-2 border-t border-white/20 pt-3 dark:border-white/10">
-							<button onclick={() => openEditExp(item)} class="flex cursor-pointer items-center gap-1 rounded-full bg-white/20 px-3 py-1.5 text-xs font-bold transition hover:bg-white/40"><Edit3 size={14} /> Edit</button>
-							<form method="POST" action="?/deleteExperience">
+							<button
+								onclick={() => openEditExp(item)}
+								class="flex cursor-pointer items-center gap-1 rounded-full bg-white/20 px-3 py-1.5 text-xs font-bold transition hover:bg-white/40"
+								><Edit3 size={14} /> Edit</button
+							>
+							<form use:enhance={submit} method="POST" action="?/deleteExperience">
 								<input type="hidden" name="id" value={item.id} />
-								<button type="submit" onclick={(e) => !confirm('Delete item?') && e.preventDefault()} class="flex cursor-pointer items-center gap-1 rounded-full bg-red-500/10 px-3 py-1.5 text-xs font-bold text-red-500 transition hover:bg-red-500/20"><Trash2 size={14} /> Delete</button>
+								<button
+									type="submit"
+									disabled={pending}
+									onclick={(e) => !confirm('Delete item?') && e.preventDefault()}
+									class="flex cursor-pointer items-center gap-1 rounded-full bg-red-500/10 px-3 py-1.5 text-xs font-bold text-red-500 transition hover:bg-red-500/20"
+									><Trash2 size={14} /> Delete</button
+								>
 							</form>
 						</div>
 					</div>
@@ -303,7 +444,9 @@
 			<div class="mb-6 flex items-center justify-between">
 				<div>
 					<h2 class="text-2xl font-black tracking-tight">Projects</h2>
-					<p class="text-xs text-foreground/60">Portfolio web apps, repositories, and category groupings.</p>
+					<p class="text-xs text-foreground/60">
+						Portfolio web apps, repositories, and category groupings.
+					</p>
 				</div>
 				<button
 					onclick={openAddProj}
@@ -314,31 +457,69 @@
 				</button>
 			</div>
 
+			<div class="project-search">
+				<label for="project-search">Find a project</label><label class="editor-field"
+					><span>Search by name, description, or technology</span><input
+						id="project-search"
+						type="search"
+						bind:value={search}
+						placeholder="Search by name, description, or technology"
+					/></label
+				><span>{filteredProjects.length} of {projects.length} projects</span>
+			</div>
+			{#if filteredProjects.length === 0}<p class="empty-state">
+					No projects match your search.
+				</p>{/if}
 			<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-				{#each projects as item (item.id)}
-					<div class="flex flex-col justify-between rounded-3xl border border-white/30 bg-white/40 p-5 shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-black/30">
+				{#each filteredProjects as item (item.id)}
+					<div
+						class="flex flex-col justify-between rounded-3xl border border-white/30 bg-white/40 p-5 shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-black/30"
+					>
 						<div>
 							<div class="mb-2 flex items-start justify-between">
 								<h3 class="text-base font-bold">{item.title}</h3>
-								<span class="rounded-full border border-orange/30 bg-orange/10 px-2 py-0.5 text-[10px] font-bold text-orange">{item.groupCategory}</span>
+								<span
+									class="rounded-full border border-orange/30 bg-orange/10 px-2 py-0.5 text-[10px] font-bold text-orange"
+									>{groupNames[item.groupCategory || 'mobileAndTools'] || item.groupCategory}</span
+								>
 							</div>
 							<p class="mb-3 text-xs leading-relaxed text-foreground/70">{item.description}</p>
 							<div class="mb-4 flex flex-wrap gap-1">
-								{#each item.categories as cat}
-									<span class="rounded-full bg-black/5 px-2 py-0.5 text-[10px] font-semibold text-foreground/60 dark:bg-white/10">{cat}</span>
+								{#each item.categories as cat, index (index)}
+									<span
+										class="rounded-full bg-black/5 px-2 py-0.5 text-[10px] font-semibold text-foreground/60 dark:bg-white/10"
+										>{cat}</span
+									>
 								{/each}
 							</div>
 						</div>
-						<div class="flex items-center justify-between border-t border-white/20 pt-3 dark:border-white/10">
-							<a href={item.link} target="_blank" class="inline-flex cursor-pointer items-center gap-1 text-xs font-bold text-orange hover:underline">
+						<div
+							class="flex items-center justify-between border-t border-white/20 pt-3 dark:border-white/10"
+						>
+							<a
+								href={item.link}
+								target="_blank"
+								rel="external noopener noreferrer"
+								class="inline-flex cursor-pointer items-center gap-1 text-xs font-bold text-orange hover:underline"
+							>
 								<span>Link</span>
 								<ExternalLink size={12} />
 							</a>
 							<div class="flex gap-2">
-								<button onclick={() => openEditProj(item)} class="flex cursor-pointer items-center gap-1 rounded-full bg-white/20 px-3 py-1.5 text-xs font-bold hover:bg-white/40"><Edit3 size={14} /> Edit</button>
-								<form method="POST" action="?/deleteProject">
+								<button
+									onclick={() => openEditProj(item)}
+									class="flex cursor-pointer items-center gap-1 rounded-full bg-white/20 px-3 py-1.5 text-xs font-bold hover:bg-white/40"
+									><Edit3 size={14} /> Edit</button
+								>
+								<form use:enhance={submit} method="POST" action="?/deleteProject">
 									<input type="hidden" name="id" value={item.id} />
-									<button type="submit" onclick={(e) => !confirm('Delete project?') && e.preventDefault()} class="flex cursor-pointer items-center gap-1 rounded-full bg-red-500/10 px-3 py-1.5 text-xs font-bold text-red-500 hover:bg-red-500/20"><Trash2 size={14} /> Delete</button>
+									<button
+										type="submit"
+										disabled={pending}
+										onclick={(e) => !confirm('Delete project?') && e.preventDefault()}
+										class="flex cursor-pointer items-center gap-1 rounded-full bg-red-500/10 px-3 py-1.5 text-xs font-bold text-red-500 hover:bg-red-500/20"
+										><Trash2 size={14} /> Delete</button
+									>
 								</form>
 							</div>
 						</div>
@@ -354,7 +535,9 @@
 			<div class="mb-6 flex items-center justify-between">
 				<div>
 					<h2 class="text-2xl font-black tracking-tight">Academics & Milestones</h2>
-					<p class="text-xs text-foreground/60">Educational milestones, awards, degrees & TA roles.</p>
+					<p class="text-xs text-foreground/60">
+						Educational milestones, awards, degrees & TA roles.
+					</p>
 				</div>
 				<button
 					onclick={openAddAcad}
@@ -367,19 +550,36 @@
 
 			<div class="grid gap-4 md:grid-cols-2">
 				{#each academics as item (item.id)}
-					<div class="flex items-center justify-between rounded-3xl border border-white/30 bg-white/40 p-5 shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-black/30">
+					<div
+						class="flex items-center justify-between rounded-3xl border border-white/30 bg-white/40 p-5 shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-black/30"
+					>
 						<div class="flex items-center gap-4">
-							<span class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-orange/10 text-sm font-black text-orange">{item.year}</span>
+							<span
+								class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-orange/10 text-sm font-black text-orange"
+								>{item.year}</span
+							>
 							<div>
-								<span class="text-[10px] font-extrabold uppercase text-orange">Icon: {item.icon}</span>
+								<span class="text-[10px] font-extrabold text-orange uppercase"
+									>Icon: {item.icon}</span
+								>
 								<p class="text-xs font-medium text-foreground">{item.content}</p>
 							</div>
 						</div>
 						<div class="flex gap-2">
-							<button onclick={() => openEditAcad(item)} class="flex cursor-pointer items-center gap-1 rounded-full bg-white/20 px-3 py-1.5 text-xs font-bold hover:bg-white/40"><Edit3 size={14} /> Edit</button>
-							<form method="POST" action="?/deleteAcademic">
+							<button
+								onclick={() => openEditAcad(item)}
+								class="flex cursor-pointer items-center gap-1 rounded-full bg-white/20 px-3 py-1.5 text-xs font-bold hover:bg-white/40"
+								><Edit3 size={14} /> Edit</button
+							>
+							<form use:enhance={submit} method="POST" action="?/deleteAcademic">
 								<input type="hidden" name="id" value={item.id} />
-								<button type="submit" onclick={(e) => !confirm('Delete milestone?') && e.preventDefault()} class="flex cursor-pointer items-center gap-1 rounded-full bg-red-500/10 px-3 py-1.5 text-xs font-bold text-red-500 hover:bg-red-500/20"><Trash2 size={14} /> Delete</button>
+								<button
+									type="submit"
+									disabled={pending}
+									onclick={(e) => !confirm('Delete milestone?') && e.preventDefault()}
+									class="flex cursor-pointer items-center gap-1 rounded-full bg-red-500/10 px-3 py-1.5 text-xs font-bold text-red-500 hover:bg-red-500/20"
+									><Trash2 size={14} /> Delete</button
+								>
 							</form>
 						</div>
 					</div>
@@ -407,19 +607,39 @@
 
 			<div class="grid gap-4 sm:grid-cols-3">
 				{#each contacts as item (item.id)}
-					<div class="flex flex-col justify-between rounded-3xl border border-white/30 bg-white/40 p-5 shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-black/30">
+					<div
+						class="flex flex-col justify-between rounded-3xl border border-white/30 bg-white/40 p-5 shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-black/30"
+					>
 						<div>
-							<span class="text-[10px] font-extrabold uppercase text-orange">Icon: {item.icon}</span>
+							<span class="text-[10px] font-extrabold text-orange uppercase">Icon: {item.icon}</span
+							>
 							<h3 class="text-base font-bold">{item.name}</h3>
 							<p class="mb-3 text-xs font-medium text-foreground/70">{item.value}</p>
 						</div>
-						<div class="flex items-center justify-between border-t border-white/20 pt-3 dark:border-white/10">
-							<a href={item.link} target="_blank" class="cursor-pointer text-xs font-bold text-orange hover:underline">Visit Link</a>
+						<div
+							class="flex items-center justify-between border-t border-white/20 pt-3 dark:border-white/10"
+						>
+							<a
+								href={item.link}
+								target="_blank"
+								rel="external noopener noreferrer"
+								class="cursor-pointer text-xs font-bold text-orange hover:underline">Visit Link</a
+							>
 							<div class="flex gap-2">
-								<button onclick={() => openEditCont(item)} class="flex cursor-pointer items-center gap-1 rounded-full bg-white/20 px-3 py-1.5 text-xs font-bold hover:bg-white/40"><Edit3 size={14} /> Edit</button>
-								<form method="POST" action="?/deleteContact">
+								<button
+									onclick={() => openEditCont(item)}
+									class="flex cursor-pointer items-center gap-1 rounded-full bg-white/20 px-3 py-1.5 text-xs font-bold hover:bg-white/40"
+									><Edit3 size={14} /> Edit</button
+								>
+								<form use:enhance={submit} method="POST" action="?/deleteContact">
 									<input type="hidden" name="id" value={item.id} />
-									<button type="submit" onclick={(e) => !confirm('Delete contact?') && e.preventDefault()} class="flex cursor-pointer items-center gap-1 rounded-full bg-red-500/10 px-3 py-1.5 text-xs font-bold text-red-500 hover:bg-red-500/20"><Trash2 size={14} /> Delete</button>
+									<button
+										type="submit"
+										disabled={pending}
+										onclick={(e) => !confirm('Delete contact?') && e.preventDefault()}
+										class="flex cursor-pointer items-center gap-1 rounded-full bg-red-500/10 px-3 py-1.5 text-xs font-bold text-red-500 hover:bg-red-500/20"
+										><Trash2 size={14} /> Delete</button
+									>
 								</form>
 							</div>
 						</div>
@@ -435,137 +655,598 @@
 
 	<!-- EXPERIENCE MODAL -->
 	{#if activeModal === 'experience'}
-		<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-			<div class="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-white/30 bg-white/95 p-6 shadow-2xl backdrop-blur-3xl dark:border-white/10 dark:bg-zinc-900">
+		<dialog
+			class="admin-dialog"
+			aria-label="Edit portfolio item"
+			{@attach showDialog}
+			oncancel={(event) => {
+				event.preventDefault();
+				closeModal();
+			}}
+		>
+			<div
+				class="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-white/30 bg-white/95 p-6 shadow-2xl backdrop-blur-3xl dark:border-white/10 dark:bg-zinc-900"
+			>
 				<div class="mb-4 flex items-center justify-between border-b pb-3 dark:border-white/10">
 					<h3 class="text-lg font-bold">{expId ? 'Edit Experience' : 'Add Experience'}</h3>
-					<button onclick={closeModal} class="cursor-pointer text-foreground/70 hover:text-foreground"><X size={18} /></button>
+					<button
+						onclick={closeModal}
+						aria-label="Close editor"
+						disabled={pending}
+						class="cursor-pointer text-foreground/70 hover:text-foreground"><X size={18} /></button
+					>
 				</div>
-				<form method="POST" action={expId ? '?/updateExperience' : '?/createExperience'} class="flex flex-col gap-4">
+				<form
+					use:enhance={submit}
+					method="POST"
+					action={expId ? '?/updateExperience' : '?/createExperience'}
+					class="flex flex-col gap-4"
+					aria-busy={pending}
+				>
+					{#if feedback?.error}<p role="alert" class="editor-error">{feedback.error}</p>{/if}
 					{#if expId}<input type="hidden" name="id" value={expId} />{/if}
 					<div class="grid gap-3 sm:grid-cols-2">
-						<input name="company" type="text" required bind:value={expCompany} placeholder="Company" class="rounded-xl border p-2.5 text-sm dark:bg-black/50" />
-						<input name="title" type="text" required bind:value={expTitle} placeholder="Title" class="rounded-xl border p-2.5 text-sm dark:bg-black/50" />
+						<label class="editor-field"
+							><span>Company</span><input
+								name="company"
+								type="text"
+								required
+								bind:value={expCompany}
+								placeholder="Company"
+								class="rounded-xl border p-2.5 text-sm dark:bg-black/50"
+							/></label
+						>
+						<label class="editor-field"
+							><span>Title</span><input
+								name="title"
+								type="text"
+								required
+								bind:value={expTitle}
+								placeholder="Title"
+								class="rounded-xl border p-2.5 text-sm dark:bg-black/50"
+							/></label
+						>
 					</div>
 					<div class="grid gap-3 sm:grid-cols-2">
-						<input name="dates" type="text" required bind:value={expDates} placeholder="Dates (e.g. June 2026 - Present)" class="rounded-xl border p-2.5 text-sm dark:bg-black/50" />
-						<input name="sortOrder" type="number" required bind:value={expSortOrder} placeholder="Sort Order" class="rounded-xl border p-2.5 text-sm dark:bg-black/50" />
+						<label class="editor-field"
+							><span>Dates (e.g. June 2026 - Present)</span><input
+								name="dates"
+								type="text"
+								required
+								bind:value={expDates}
+								placeholder="Dates (e.g. June 2026 - Present)"
+								class="rounded-xl border p-2.5 text-sm dark:bg-black/50"
+							/></label
+						>
+						<label class="editor-field"
+							><span>Sort Order</span><input
+								name="sortOrder"
+								type="number"
+								required
+								bind:value={expSortOrder}
+								placeholder="Sort Order"
+								class="rounded-xl border p-2.5 text-sm dark:bg-black/50"
+							/></label
+						>
 					</div>
 					<div class="grid gap-3 sm:grid-cols-2">
-						<input name="link" type="url" required bind:value={expLink} placeholder="Link" class="rounded-xl border p-2.5 text-sm dark:bg-black/50" />
-						<input name="logo" type="text" required bind:value={expLogo} placeholder="Logo URL (/logos/apple-logo.jpg)" class="rounded-xl border p-2.5 text-sm dark:bg-black/50" />
+						<label class="editor-field"
+							><span>Link</span><input
+								name="link"
+								type="url"
+								required
+								bind:value={expLink}
+								placeholder="Link"
+								class="rounded-xl border p-2.5 text-sm dark:bg-black/50"
+							/></label
+						>
+						<label class="editor-field"
+							><span>Logo URL (/logos/apple-logo.jpg)</span><input
+								name="logo"
+								type="text"
+								required
+								bind:value={expLogo}
+								placeholder="Logo URL (/logos/apple-logo.jpg)"
+								class="rounded-xl border p-2.5 text-sm dark:bg-black/50"
+							/></label
+						>
 					</div>
 					<div class="flex flex-col gap-2">
-						<label id="exp-bullet-points-label" for="exp-bullet-point-0" class="text-xs font-bold">Bullet Points</label>
-						{#each expDescription as _, idx}
-							<input id="exp-bullet-point-{idx}" name="description[]" type="text" required bind:value={expDescription[idx]} placeholder="Bullet point text..." class="rounded-xl border p-2.5 text-sm dark:bg-black/50" />
+						<label id="exp-bullet-points-label" for="exp-bullet-point-0" class="text-xs font-bold"
+							>Bullet Points</label
+						>
+						{#each expDescription.keys() as idx (idx)}
+							<label class="editor-field"
+								><span>Bullet point text...</span><input
+									id="exp-bullet-point-{idx}"
+									name="description[]"
+									type="text"
+									required
+									bind:value={expDescription[idx]}
+									placeholder="Bullet point text..."
+									class="rounded-xl border p-2.5 text-sm dark:bg-black/50"
+								/></label
+							>
 						{/each}
-						<button type="button" onclick={() => (expDescription = [...expDescription, ''])} class="cursor-pointer text-xs font-bold text-orange hover:underline">+ Add Bullet Point</button>
+						<button
+							type="button"
+							onclick={() => (expDescription = [...expDescription, ''])}
+							class="cursor-pointer text-xs font-bold text-orange hover:underline"
+							>+ Add Bullet Point</button
+						>
 					</div>
 					<div class="mt-4 flex justify-end gap-3">
-						<button type="button" onclick={closeModal} class="cursor-pointer rounded-full bg-black/5 px-4 py-2 text-xs font-bold hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/20">Cancel</button>
-						<button type="submit" class="cursor-pointer rounded-full bg-orange px-5 py-2 text-xs font-bold text-white shadow-md hover:bg-orange/90">Save</button>
+						<button
+							type="button"
+							onclick={closeModal}
+							class="cursor-pointer rounded-full bg-black/5 px-4 py-2 text-xs font-bold hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/20"
+							>Cancel</button
+						>
+						<button
+							type="submit"
+							disabled={pending}
+							class="cursor-pointer rounded-full bg-orange px-5 py-2 text-xs font-bold text-white shadow-md hover:bg-orange/90"
+							>{pending ? 'Saving…' : 'Save changes'}</button
+						>
 					</div>
 				</form>
 			</div>
-		</div>
+		</dialog>
 	{/if}
 
 	<!-- PROJECT MODAL -->
 	{#if activeModal === 'project'}
-		<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-			<div class="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-3xl border border-white/30 bg-white/95 p-6 shadow-2xl backdrop-blur-3xl dark:border-white/10 dark:bg-zinc-900">
+		<dialog
+			class="admin-dialog"
+			aria-label="Edit portfolio item"
+			{@attach showDialog}
+			oncancel={(event) => {
+				event.preventDefault();
+				closeModal();
+			}}
+		>
+			<div
+				class="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-3xl border border-white/30 bg-white/95 p-6 shadow-2xl backdrop-blur-3xl dark:border-white/10 dark:bg-zinc-900"
+			>
 				<div class="mb-4 flex items-center justify-between border-b pb-3 dark:border-white/10">
 					<h3 class="text-lg font-bold">{projId ? 'Edit Project' : 'Add Project'}</h3>
-					<button onclick={closeModal} class="cursor-pointer text-foreground/70 hover:text-foreground"><X size={18} /></button>
+					<button
+						onclick={closeModal}
+						aria-label="Close editor"
+						disabled={pending}
+						class="cursor-pointer text-foreground/70 hover:text-foreground"><X size={18} /></button
+					>
 				</div>
-				<form method="POST" action={projId ? '?/updateProject' : '?/createProject'} class="flex flex-col gap-4">
+				<form
+					use:enhance={submit}
+					method="POST"
+					action={projId ? '?/updateProject' : '?/createProject'}
+					class="flex flex-col gap-4"
+					aria-busy={pending}
+				>
+					{#if feedback?.error}<p role="alert" class="editor-error">{feedback.error}</p>{/if}
 					{#if projId}<input type="hidden" name="id" value={projId} />{/if}
-					<input name="title" type="text" required bind:value={projTitle} placeholder="Project Title" class="rounded-xl border p-2.5 text-sm dark:bg-black/50" />
-					<textarea name="description" required bind:value={projDescription} placeholder="Description" class="h-20 rounded-xl border p-2.5 text-sm dark:bg-black/50"></textarea>
+					<label class="editor-field"
+						><span>Project Title</span><input
+							name="title"
+							type="text"
+							required
+							bind:value={projTitle}
+							placeholder="Project Title"
+							class="rounded-xl border p-2.5 text-sm dark:bg-black/50"
+						/></label
+					>
+					<label class="editor-field"
+						><span>Description</span><textarea
+							name="description"
+							required
+							bind:value={projDescription}
+							placeholder="Description"
+							class="h-20 rounded-xl border p-2.5 text-sm dark:bg-black/50"
+						></textarea></label
+					>
 					<div class="grid gap-3 sm:grid-cols-2">
-						<input name="link" type="url" required bind:value={projLink} placeholder="Repository / Site Link" class="rounded-xl border p-2.5 text-sm dark:bg-black/50" />
-						<select name="groupCategory" bind:value={projGroupCategory} class="cursor-pointer rounded-xl border p-2.5 text-sm dark:bg-black/50">
-							<option value="webAndFullStack">Web & Full Stack</option>
-							<option value="dataAndBackend">Data & Backend</option>
-							<option value="systemsAndLogic">Systems & Logic</option>
-							<option value="mobileAndTools">Mobile & Tools</option>
-						</select>
+						<label class="editor-field"
+							><span>Repository / Site Link</span><input
+								name="link"
+								type="url"
+								required
+								bind:value={projLink}
+								placeholder="Repository / Site Link"
+								class="rounded-xl border p-2.5 text-sm dark:bg-black/50"
+							/></label
+						>
+						<label class="editor-field"
+							><span>Project group</span><select
+								name="groupCategory"
+								bind:value={projGroupCategory}
+								class="cursor-pointer rounded-xl border p-2.5 text-sm dark:bg-black/50"
+							>
+								<option value="webAndFullStack">Web & Full Stack</option>
+								<option value="dataAndBackend">Data & Backend</option>
+								<option value="systemsAndLogic">Systems & Logic</option>
+								<option value="mobileAndTools">Mobile & Tools</option>
+							</select></label
+						>
 					</div>
 					<div class="grid gap-3 sm:grid-cols-2">
-						<input name="categories" type="text" required bind:value={projCategories} placeholder="Categories (comma separated: Web, Database)" class="rounded-xl border p-2.5 text-sm dark:bg-black/50" />
-						<input name="sortOrder" type="number" required bind:value={projSortOrder} placeholder="Sort Order" class="rounded-xl border p-2.5 text-sm dark:bg-black/50" />
+						<label class="editor-field"
+							><span>Categories (comma separated: Web, Database)</span><input
+								name="categories"
+								type="text"
+								required
+								bind:value={projCategories}
+								placeholder="Categories (comma separated: Web, Database)"
+								class="rounded-xl border p-2.5 text-sm dark:bg-black/50"
+							/></label
+						>
+						<label class="editor-field"
+							><span>Sort Order</span><input
+								name="sortOrder"
+								type="number"
+								required
+								bind:value={projSortOrder}
+								placeholder="Sort Order"
+								class="rounded-xl border p-2.5 text-sm dark:bg-black/50"
+							/></label
+						>
 					</div>
 					<div class="mt-4 flex justify-end gap-3">
-						<button type="button" onclick={closeModal} class="cursor-pointer rounded-full bg-black/5 px-4 py-2 text-xs font-bold hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/20">Cancel</button>
-						<button type="submit" class="cursor-pointer rounded-full bg-orange px-5 py-2 text-xs font-bold text-white shadow-md hover:bg-orange/90">Save</button>
+						<button
+							type="button"
+							onclick={closeModal}
+							class="cursor-pointer rounded-full bg-black/5 px-4 py-2 text-xs font-bold hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/20"
+							>Cancel</button
+						>
+						<button
+							type="submit"
+							disabled={pending}
+							class="cursor-pointer rounded-full bg-orange px-5 py-2 text-xs font-bold text-white shadow-md hover:bg-orange/90"
+							>{pending ? 'Saving…' : 'Save changes'}</button
+						>
 					</div>
 				</form>
 			</div>
-		</div>
+		</dialog>
 	{/if}
 
 	<!-- ACADEMIC MODAL -->
 	{#if activeModal === 'academic'}
-		<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-			<div class="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-white/30 bg-white/95 p-6 shadow-2xl backdrop-blur-3xl dark:border-white/10 dark:bg-zinc-900">
+		<dialog
+			class="admin-dialog"
+			aria-label="Edit portfolio item"
+			{@attach showDialog}
+			oncancel={(event) => {
+				event.preventDefault();
+				closeModal();
+			}}
+		>
+			<div
+				class="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-white/30 bg-white/95 p-6 shadow-2xl backdrop-blur-3xl dark:border-white/10 dark:bg-zinc-900"
+			>
 				<div class="mb-4 flex items-center justify-between border-b pb-3 dark:border-white/10">
 					<h3 class="text-lg font-bold">{acadId ? 'Edit Academic Milestone' : 'Add Milestone'}</h3>
-					<button onclick={closeModal} class="cursor-pointer text-foreground/70 hover:text-foreground"><X size={18} /></button>
+					<button
+						onclick={closeModal}
+						aria-label="Close editor"
+						disabled={pending}
+						class="cursor-pointer text-foreground/70 hover:text-foreground"><X size={18} /></button
+					>
 				</div>
-				<form method="POST" action={acadId ? '?/updateAcademic' : '?/createAcademic'} class="flex flex-col gap-4">
+				<form
+					use:enhance={submit}
+					method="POST"
+					action={acadId ? '?/updateAcademic' : '?/createAcademic'}
+					class="flex flex-col gap-4"
+					aria-busy={pending}
+				>
+					{#if feedback?.error}<p role="alert" class="editor-error">{feedback.error}</p>{/if}
 					{#if acadId}<input type="hidden" name="id" value={acadId} />{/if}
 					<div class="grid gap-3 sm:grid-cols-2">
-						<input name="year" type="text" required bind:value={acadYear} placeholder="Year (e.g. 2025)" class="rounded-xl border p-2.5 text-sm dark:bg-black/50" />
-						<select name="icon" bind:value={acadIcon} class="cursor-pointer rounded-xl border p-2.5 text-sm dark:bg-black/50">
-							<option value="graduationCap">Graduation Cap</option>
-							<option value="school">School</option>
-							<option value="briefcase">Briefcase</option>
-							<option value="award">Award</option>
-							<option value="mic">Mic</option>
-							<option value="badgeCheck">Badge Check</option>
-							<option value="users">Users</option>
-							<option value="star">Star</option>
-						</select>
+						<label class="editor-field"
+							><span>Year (e.g. 2025)</span><input
+								name="year"
+								type="text"
+								required
+								bind:value={acadYear}
+								placeholder="Year (e.g. 2025)"
+								class="rounded-xl border p-2.5 text-sm dark:bg-black/50"
+							/></label
+						>
+						<label class="editor-field"
+							><span>Icon</span><select
+								name="icon"
+								bind:value={acadIcon}
+								class="cursor-pointer rounded-xl border p-2.5 text-sm dark:bg-black/50"
+							>
+								<option value="graduationCap">Graduation Cap</option>
+								<option value="school">School</option>
+								<option value="briefcase">Briefcase</option>
+								<option value="award">Award</option>
+								<option value="mic">Mic</option>
+								<option value="badgeCheck">Badge Check</option>
+								<option value="users">Users</option>
+								<option value="star">Star</option>
+							</select></label
+						>
 					</div>
-					<textarea name="content" required bind:value={acadContent} placeholder="Milestone description..." class="h-20 rounded-xl border p-2.5 text-sm dark:bg-black/50"></textarea>
-					<input name="sortOrder" type="number" required bind:value={acadSortOrder} placeholder="Sort Order" class="rounded-xl border p-2.5 text-sm dark:bg-black/50" />
+					<label class="editor-field"
+						><span>Milestone description...</span><textarea
+							name="content"
+							required
+							bind:value={acadContent}
+							placeholder="Milestone description..."
+							class="h-20 rounded-xl border p-2.5 text-sm dark:bg-black/50"
+						></textarea></label
+					>
+					<label class="editor-field"
+						><span>Sort Order</span><input
+							name="sortOrder"
+							type="number"
+							required
+							bind:value={acadSortOrder}
+							placeholder="Sort Order"
+							class="rounded-xl border p-2.5 text-sm dark:bg-black/50"
+						/></label
+					>
 					<div class="mt-4 flex justify-end gap-3">
-						<button type="button" onclick={closeModal} class="cursor-pointer rounded-full bg-black/5 px-4 py-2 text-xs font-bold hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/20">Cancel</button>
-						<button type="submit" class="cursor-pointer rounded-full bg-orange px-5 py-2 text-xs font-bold text-white shadow-md hover:bg-orange/90">Save</button>
+						<button
+							type="button"
+							onclick={closeModal}
+							class="cursor-pointer rounded-full bg-black/5 px-4 py-2 text-xs font-bold hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/20"
+							>Cancel</button
+						>
+						<button
+							type="submit"
+							disabled={pending}
+							class="cursor-pointer rounded-full bg-orange px-5 py-2 text-xs font-bold text-white shadow-md hover:bg-orange/90"
+							>{pending ? 'Saving…' : 'Save changes'}</button
+						>
 					</div>
 				</form>
 			</div>
-		</div>
+		</dialog>
 	{/if}
 
 	<!-- CONTACT MODAL -->
 	{#if activeModal === 'contact'}
-		<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-			<div class="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-white/30 bg-white/95 p-6 shadow-2xl backdrop-blur-3xl dark:border-white/10 dark:bg-zinc-900">
+		<dialog
+			class="admin-dialog"
+			aria-label="Edit portfolio item"
+			{@attach showDialog}
+			oncancel={(event) => {
+				event.preventDefault();
+				closeModal();
+			}}
+		>
+			<div
+				class="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-white/30 bg-white/95 p-6 shadow-2xl backdrop-blur-3xl dark:border-white/10 dark:bg-zinc-900"
+			>
 				<div class="mb-4 flex items-center justify-between border-b pb-3 dark:border-white/10">
 					<h3 class="text-lg font-bold">{contId ? 'Edit Contact' : 'Add Contact'}</h3>
-					<button onclick={closeModal} class="cursor-pointer text-foreground/70 hover:text-foreground"><X size={18} /></button>
+					<button
+						onclick={closeModal}
+						aria-label="Close editor"
+						disabled={pending}
+						class="cursor-pointer text-foreground/70 hover:text-foreground"><X size={18} /></button
+					>
 				</div>
-				<form method="POST" action={contId ? '?/updateContact' : '?/createContact'} class="flex flex-col gap-4">
+				<form
+					use:enhance={submit}
+					method="POST"
+					action={contId ? '?/updateContact' : '?/createContact'}
+					class="flex flex-col gap-4"
+					aria-busy={pending}
+				>
+					{#if feedback?.error}<p role="alert" class="editor-error">{feedback.error}</p>{/if}
 					{#if contId}<input type="hidden" name="id" value={contId} />{/if}
 					<div class="grid gap-3 sm:grid-cols-2">
-						<input name="name" type="text" required bind:value={contName} placeholder="Name (e.g. GitHub)" class="rounded-xl border p-2.5 text-sm dark:bg-black/50" />
-						<select name="icon" bind:value={contIcon} class="cursor-pointer rounded-xl border p-2.5 text-sm dark:bg-black/50">
-							<option value="mail">Mail</option>
-							<option value="github">GitHub</option>
-							<option value="linkedin">LinkedIn</option>
-						</select>
+						<label class="editor-field"
+							><span>Name (e.g. GitHub)</span><input
+								name="name"
+								type="text"
+								required
+								bind:value={contName}
+								placeholder="Name (e.g. GitHub)"
+								class="rounded-xl border p-2.5 text-sm dark:bg-black/50"
+							/></label
+						>
+						<label class="editor-field"
+							><span>Icon</span><select
+								name="icon"
+								bind:value={contIcon}
+								class="cursor-pointer rounded-xl border p-2.5 text-sm dark:bg-black/50"
+							>
+								<option value="mail">Mail</option>
+								<option value="github">GitHub</option>
+								<option value="linkedin">LinkedIn</option>
+							</select></label
+						>
 					</div>
-					<input name="value" type="text" required bind:value={contValue} placeholder="Value (e.g. @dehadeaaryan)" class="rounded-xl border p-2.5 text-sm dark:bg-black/50" />
-					<input name="link" type="url" required bind:value={contLink} placeholder="Link URL" class="rounded-xl border p-2.5 text-sm dark:bg-black/50" />
-					<input name="sortOrder" type="number" required bind:value={contSortOrder} placeholder="Sort Order" class="rounded-xl border p-2.5 text-sm dark:bg-black/50" />
+					<label class="editor-field"
+						><span>Value (e.g. @dehadeaaryan)</span><input
+							name="value"
+							type="text"
+							required
+							bind:value={contValue}
+							placeholder="Value (e.g. @dehadeaaryan)"
+							class="rounded-xl border p-2.5 text-sm dark:bg-black/50"
+						/></label
+					>
+					<label class="editor-field"
+						><span>Link URL</span><input
+							name="link"
+							type="text"
+							required
+							bind:value={contLink}
+							placeholder="Link URL"
+							class="rounded-xl border p-2.5 text-sm dark:bg-black/50"
+						/></label
+					>
+					<label class="editor-field"
+						><span>Sort Order</span><input
+							name="sortOrder"
+							type="number"
+							required
+							bind:value={contSortOrder}
+							placeholder="Sort Order"
+							class="rounded-xl border p-2.5 text-sm dark:bg-black/50"
+						/></label
+					>
 					<div class="mt-4 flex justify-end gap-3">
-						<button type="button" onclick={closeModal} class="cursor-pointer rounded-full bg-black/5 px-4 py-2 text-xs font-bold hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/20">Cancel</button>
-						<button type="submit" class="cursor-pointer rounded-full bg-orange px-5 py-2 text-xs font-bold text-white shadow-md hover:bg-orange/90">Save</button>
+						<button
+							type="button"
+							onclick={closeModal}
+							class="cursor-pointer rounded-full bg-black/5 px-4 py-2 text-xs font-bold hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/20"
+							>Cancel</button
+						>
+						<button
+							type="submit"
+							disabled={pending}
+							class="cursor-pointer rounded-full bg-orange px-5 py-2 text-xs font-bold text-white shadow-md hover:bg-orange/90"
+							>{pending ? 'Saving…' : 'Save changes'}</button
+						>
 					</div>
 				</form>
 			</div>
-		</div>
+		</dialog>
 	{/if}
 </div>
+
+<style lang="postcss">
+	@reference '../layout.css';
+	.admin-brand {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		font-size: 20px;
+		font-weight: 900;
+		line-height: 1.1;
+	}
+	.admin-brand img {
+		border-radius: 9px;
+	}
+	.admin-brand small {
+		display: block;
+		font-size: 10px;
+		font-weight: 600;
+		margin-top: 5px;
+		opacity: 0.55;
+	}
+	.admin-intro {
+		margin-bottom: 28px;
+	}
+	.admin-intro > span {
+		font-size: 11px;
+		font-weight: 800;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+	.admin-intro h1 {
+		font-size: clamp(26px, 4vw, 36px);
+		font-weight: 900;
+		letter-spacing: -0.04em;
+		margin: 8px 0;
+	}
+	.admin-intro p {
+		@apply text-foreground/60;
+		font-size: 14px;
+	}
+	.admin-tabs {
+		border-radius: 20px;
+		gap: 4px;
+	}
+	.admin-tabs button {
+		flex: 1;
+		justify-content: center;
+		white-space: nowrap;
+		min-height: 44px;
+	}
+	.project-search {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 12px;
+		margin-bottom: 24px;
+	}
+	.project-search label {
+		font-size: 13px;
+		font-weight: 700;
+	}
+	.project-search input {
+		@apply border border-foreground/15 bg-white/50 dark:bg-white/5;
+		flex: 1;
+		min-width: 180px;
+		padding: 12px 16px;
+		border-radius: 14px;
+		font-size: 14px;
+	}
+	.project-search > span {
+		@apply text-foreground/55;
+		font-size: 12px;
+	}
+	.empty-state {
+		padding: 40px;
+		text-align: center;
+	}
+	.admin-dialog {
+		@apply text-foreground;
+		background: transparent;
+		border: 0;
+		padding: 16px;
+		margin: auto;
+		width: 100%;
+		max-width: 720px;
+		max-height: 100dvh;
+	}
+	.admin-dialog::backdrop {
+		background: rgb(0 0 0 / 0.65);
+		backdrop-filter: blur(8px);
+	}
+	.editor-field {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		min-width: 0;
+	}
+	.editor-field > span {
+		@apply text-foreground/70;
+		font-size: 12px;
+		font-weight: 700;
+	}
+	.editor-field input,
+	.editor-field textarea,
+	.editor-field select {
+		width: 100%;
+		font-size: 16px;
+	}
+	.editor-error {
+		@apply border border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400;
+		padding: 12px;
+		border-radius: 12px;
+		font-size: 14px;
+	}
+	:global(.admin-page button) {
+		min-height: 40px;
+	}
+	:global(.admin-page button:disabled) {
+		opacity: 0.5;
+		cursor: wait;
+	}
+	@media (max-width: 640px) {
+		.admin-tabs {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+		.admin-tabs button {
+			padding: 10px;
+		}
+		main > :global(div.mb-6) {
+			gap: 12px;
+			flex-wrap: wrap;
+		}
+		:global(.admin-page header a:first-child > span) {
+			display: none;
+		}
+	}
+</style>

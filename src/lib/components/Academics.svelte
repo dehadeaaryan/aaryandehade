@@ -1,6 +1,7 @@
 <script lang="ts">
+	import snapshot from '$lib/portfolio.json';
+	import type { Snippet } from 'svelte';
 	import { ArcTimeline } from '$lib/components/ui/arc-timeline';
-	import type { ArcTimelineItem } from '$lib/components/ui/arc-timeline';
 	import {
 		Award,
 		BadgeCheck,
@@ -21,9 +22,9 @@
 		content: string;
 	}
 
-	let { academics = [] }: { academics?: AcademicItem[] } = $props();
+	let { academics = snapshot.academics }: { academics?: AcademicItem[] } = $props();
 
-	const iconMap: Record<string, any> = {
+	const iconMap: Record<string, Snippet> = {
 		graduationCap: graduationCapIcon,
 		school: schoolIcon,
 		briefcase: briefcaseIcon,
@@ -33,81 +34,6 @@
 		users: usersIcon,
 		star: starIcon
 	};
-
-	const defaultTimeline: ArcTimelineItem[] = [
-		{
-			time: '2021',
-			steps: [
-				{
-					icon: graduationCapIcon,
-					content: 'Graduated from Navrachana Higher Secondary School.'
-				},
-				{
-					icon: schoolIcon,
-					content: 'Started attending classes at Texas Christian University (TCU).'
-				}
-			]
-		},
-		{
-			time: '2022',
-			steps: [
-				{
-					icon: briefcaseIcon,
-					content: 'Started working as a TA for Computer Science and a grader for Math Calculus 1.'
-				},
-				{
-					icon: awardIcon,
-					content: 'Received the TCU Scholar award for academic excellence.'
-				}
-			]
-		},
-		{
-			time: '2023',
-			steps: [
-				{
-					icon: micIcon,
-					content: 'Nominated by TCU Math faculty to represent the university on a Math podcast.'
-				},
-				{
-					icon: briefcaseIcon,
-					content: 'Began role as a Resident Assistant (RA) for over 30 residents in TCU housing.'
-				},
-				{
-					icon: badgeCheckIcon,
-					content: 'Earned the MongoDB Associate Developer certification.'
-				},
-				{
-					icon: awardIcon,
-					content:
-						'Received Dean`s List award for outstanding academic performance in both Fall and Spring semesters.'
-				}
-			]
-		},
-		{
-			time: '2024',
-			steps: [
-				{
-					icon: usersIcon,
-					content:
-						'Promoted to Community Manager by TCU Housing, managing a community of 200+ students.'
-				},
-				{
-					icon: starIcon,
-					content: 'Received Dean`s List award for outstanding academic performance.'
-				}
-			]
-		},
-		{
-			time: '2025',
-			steps: [
-				{
-					icon: graduationCapIcon,
-					content:
-						'Graduated from TCU Magna Cum Laude with a 3.83 GPA and received the TCU Scholar award again.'
-				}
-			]
-		}
-	];
 
 	const timelineData = $derived.by(() => {
 		if (academics && academics.length > 0) {
@@ -122,7 +48,7 @@
 					}))
 			}));
 		}
-		return defaultTimeline;
+		return [];
 	});
 
 	// Create a flattened array of all steps to make navigation math easy

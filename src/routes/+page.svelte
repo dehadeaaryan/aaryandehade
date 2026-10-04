@@ -11,7 +11,6 @@
 
 <svelte:head>
 	<title>Aaryan Dehade | Software Engineer</title>
-	<meta name="description" content="Aaryan Dehade's Portfolio Website." />
 </svelte:head>
 
 <Header />

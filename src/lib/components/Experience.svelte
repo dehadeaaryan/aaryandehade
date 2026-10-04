@@ -6,9 +6,7 @@
 	import { crossfade } from 'svelte/transition';
 	import { cubicInOut } from 'svelte/easing';
 
-	import appleLogo from '$lib/assets/apple-logo.jpg';
-	import ipelintLogo from '$lib/assets/ipelint-logo.jpeg';
-	import qualcommLogo from '$lib/assets/qualcomm-logo.jpg';
+	import snapshot from '$lib/portfolio.json';
 
 	// Set up the sliding animation for the tabs
 	const [send, receive] = crossfade({
@@ -50,76 +48,9 @@
 		logo: string;
 	}
 
-	let { experiences = [] }: { experiences?: ExperienceItem[] } = $props();
+	let { experiences = snapshot.experiences }: { experiences?: ExperienceItem[] } = $props();
 
-	const fallbackExperiences: ExperienceItem[] = [
-		{
-			company: 'Apple',
-			link: 'https://www.apple.com',
-			title: 'Software Development Engineer in Test',
-			dates: 'June 2026 - Present',
-			description: [
-				'Designing and automating robust Maps UI test cases for Android using Espresso and Jetpack Compose, focusing on flake reduction and overall test reliability.',
-				'Owning testing features and collaborating closely with cross-functional Android development teams to improve application testability, triage failures, and solve complex automation challenges.',
-				'Building and maintaining modern, scalable automation frameworks across app, SDK, and API levels to establish comprehensive CI readiness.',
-				'Developing stable automation patterns—such as reliable selectors and synchronization architectures—and contributing to internal documentation to ensure long-term maintainability.'
-			],
-			logo: appleLogo
-		},
-		{
-			company: 'Apple',
-			link: 'https://www.apple.com',
-			title: 'Software Development Engineer in Test',
-			dates: 'July 2025 - May 2026',
-			description: [
-				'Designed and automated functional, end-to-end UI, and API tests for the Apple Maps Data platform, adding 70+ targeted regression tests to strengthen coverage of critical Places data workflows.',
-				'Enhanced an internal triage web portal using Python and JavaScript, adding multiple diagnostic tools and improving an existing scheduler system to make system health and test results 40% faster to access.',
-				'Built AI agents and reusable skills to generate test cases from test plan links, reducing manual test authoring time by ~50%.',
-				'Collaborated with international and cross-functional teams to deliver automation and quality targets.'
-			],
-			logo: appleLogo
-		},
-		{
-			company: 'iPELiNT',
-			link: 'https://www.ipelint.com',
-			title: 'Senior Design Project',
-			dates: 'Sept 2024 - May 2025',
-			description: [
-				'Created and enhanced machine learning models to detect and classify patents with 99% top-5 accuracy, improving the patent search experience for users.',
-				'Contributed to the development of a web application using Vue, node.js and MongoDB, enabling users to easily search and analyze patent data with an intuitive and modern interface.',
-				'Collaborated with a team of 4 to design and implement new features, fix bugs, and optimize performance, resulting in a more robust and user-friendly product.'
-			],
-			logo: ipelintLogo
-		},
-		{
-			company: 'Qualcomm',
-			link: 'https://www.qualcomm.com',
-			title: 'SWE Intern (2024)',
-			dates: 'May 2024 - Aug 2024',
-			description: [
-				'Collaborated on a testing team to deliver 4 critical features boosting user efficiency by 100%.',
-				'Introduced new functionality and optimized performance for teams under modem technology.',
-				'Captained a team of 5 interns in developing an AI-powered application to enhance meeting productivity.',
-				'Represented 200+ interns on a six-member committee liaising with senior leadership.'
-			],
-			logo: qualcommLogo
-		},
-		{
-			company: 'Qualcomm',
-			link: 'https://www.qualcomm.com',
-			title: 'SWE Intern (2023)',
-			dates: 'May 2023 - Aug 2023',
-			description: [
-				'Improved development efficiency by 20% across 5+ teams by creating tools using React.',
-				'Accelerated frontend delivery by 50% using Micro Frontends while managing 3 Agile projects.'
-			],
-			logo: qualcommLogo
-		}
-	];
-
-	const displayExperiences = $derived(
-		experiences && experiences.length > 0 ? experiences : fallbackExperiences
-	);
+	const displayExperiences = $derived(experiences);
 </script>
 
 <section id="experience">
@@ -145,7 +76,7 @@
 			>
 				<Carousel.Root setApi={(emblaApi) => (api = emblaApi)} class="carousel-root">
 					<Carousel.Content>
-						{#each displayExperiences as experience}
+						{#each displayExperiences as experience (`${experience.company}:${experience.dates}:${experience.title}`)}
 							<Carousel.Item class="carousel-item">
 								<div class="card-spacing-wrapper">
 									<div class="glass-card">
@@ -153,6 +84,10 @@
 											<div class="logo-container">
 												<img
 													src={experience.logo}
+													loading="lazy"
+													decoding="async"
+													width="64"
+													height="64"
 													alt="{experience.company} logo"
 													class="card-logo"
 												/>
@@ -165,7 +100,7 @@
 												<a
 													href={experience.link}
 													target="_blank"
-													rel="noopener noreferrer"
+													rel="external noopener noreferrer"
 													class="card-company"
 												>
 													{experience.company}
@@ -175,7 +110,7 @@
 
 										<div class="card-body">
 											<ul class="card-description">
-												{#each experience.description as point}
+												{#each experience.description as point, pointIndex (pointIndex)}
 													<li>{point}</li>
 												{/each}
 											</ul>
@@ -210,7 +145,7 @@
 
 			<div class="tabs-wrapper">
 				<div class="tabs-container" role="tablist" aria-label="Experience slides">
-					{#each displayExperiences as experience, i}
+					{#each displayExperiences as experience, i (`${experience.company}:${experience.dates}:${experience.title}`)}
 						<button
 							class="glass-tab group"
 							role="tab"

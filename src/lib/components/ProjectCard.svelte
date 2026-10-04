@@ -9,12 +9,17 @@
 	let { title, description, link, categories }: Props = $props();
 </script>
 
-<a href={link} target="_blank" rel="noopener noreferrer" class="glass-project-card group/card">
+<a
+	href={link}
+	target="_blank"
+	rel="external noopener noreferrer"
+	class="glass-project-card group/card"
+>
 	<div class="flex h-full flex-col p-6 md:p-8">
 		<h3 class="card-title group-hover/card:text-orange">{title}</h3>
 		<p class="card-description">{description}</p>
 		<div class="mt-auto flex flex-wrap gap-2 pt-6">
-			{#each categories as category}
+			{#each categories as category, index (index)}
 				<span class="glass-tag">
 					{category}
 				</span>

@@ -1,3 +1,4 @@
+import { invalidatePortfolio } from '$lib/server/portfolio';
 import { db } from '$lib/server/db';
 import { experience, project, academic, contact } from '$lib/server/db/schema';
 import { auth } from '$lib/server/auth';
@@ -58,7 +59,8 @@ export const actions: Actions = {
 
 	// --- EXPERIENCE ACTIONS ---
 	createExperience: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email)) return fail(401, { error: 'Unauthorized' });
+		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const company = formData.get('company')?.toString().trim();
 		const title = formData.get('title')?.toString().trim();
@@ -66,9 +68,13 @@ export const actions: Actions = {
 		const link = formData.get('link')?.toString().trim() || '#';
 		const logo = formData.get('logo')?.toString().trim() || '/logos/apple-logo.jpg';
 		const sortOrderRaw = formData.get('sortOrder')?.toString();
-		const descriptionRaw = formData.getAll('description[]').map((d) => d.toString().trim()).filter(Boolean);
+		const descriptionRaw = formData
+			.getAll('description[]')
+			.map((d) => d.toString().trim())
+			.filter(Boolean);
 
-		if (!company || !title || !dates) return fail(400, { error: 'Company, Title, and Dates are required.' });
+		if (!company || !title || !dates)
+			return fail(400, { error: 'Company, Title, and Dates are required.' });
 
 		try {
 			await db.insert(experience).values({
@@ -80,6 +86,7 @@ export const actions: Actions = {
 				description: descriptionRaw.length > 0 ? descriptionRaw : ['New experience bullet.'],
 				sortOrder: sortOrderRaw ? parseInt(sortOrderRaw, 10) : 0
 			});
+			invalidatePortfolio();
 			return { success: true, message: 'Experience added successfully!' };
 		} catch (err) {
 			console.error(err);
@@ -88,7 +95,8 @@ export const actions: Actions = {
 	},
 
 	updateExperience: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email)) return fail(401, { error: 'Unauthorized' });
+		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const id = parseInt(formData.get('id')?.toString() || '0', 10);
 		if (!id) return fail(400, { error: 'ID is required.' });
@@ -99,9 +107,13 @@ export const actions: Actions = {
 		const link = formData.get('link')?.toString().trim() || '#';
 		const logo = formData.get('logo')?.toString().trim() || '/logos/apple-logo.jpg';
 		const sortOrderRaw = formData.get('sortOrder')?.toString();
-		const descriptionRaw = formData.getAll('description[]').map((d) => d.toString().trim()).filter(Boolean);
+		const descriptionRaw = formData
+			.getAll('description[]')
+			.map((d) => d.toString().trim())
+			.filter(Boolean);
 
-		if (!company || !title || !dates) return fail(400, { error: 'Company, Title, and Dates are required.' });
+		if (!company || !title || !dates)
+			return fail(400, { error: 'Company, Title, and Dates are required.' });
 
 		try {
 			await db
@@ -117,6 +129,7 @@ export const actions: Actions = {
 					updatedAt: new Date()
 				})
 				.where(eq(experience.id, id));
+			invalidatePortfolio();
 			return { success: true, message: 'Experience updated successfully!' };
 		} catch (err) {
 			console.error(err);
@@ -125,13 +138,15 @@ export const actions: Actions = {
 	},
 
 	deleteExperience: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email)) return fail(401, { error: 'Unauthorized' });
+		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const id = parseInt(formData.get('id')?.toString() || '0', 10);
 		if (!id) return fail(400, { error: 'ID is required.' });
 
 		try {
 			await db.delete(experience).where(eq(experience.id, id));
+			invalidatePortfolio();
 			return { success: true, message: 'Experience deleted successfully!' };
 		} catch (err) {
 			console.error(err);
@@ -141,16 +156,23 @@ export const actions: Actions = {
 
 	// --- PROJECT ACTIONS ---
 	createProject: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email)) return fail(401, { error: 'Unauthorized' });
+		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const title = formData.get('title')?.toString().trim();
 		const description = formData.get('description')?.toString().trim();
 		const link = formData.get('link')?.toString().trim() || '#';
 		const groupCategory = formData.get('groupCategory')?.toString().trim() || 'webAndFullStack';
-		const categoriesRaw = formData.get('categories')?.toString().split(',').map((c) => c.trim()).filter(Boolean) || ['Web'];
+		const categoriesRaw = formData
+			.get('categories')
+			?.toString()
+			.split(',')
+			.map((c) => c.trim())
+			.filter(Boolean) || ['Web'];
 		const sortOrderRaw = formData.get('sortOrder')?.toString();
 
-		if (!title || !description) return fail(400, { error: 'Project Title and Description are required.' });
+		if (!title || !description)
+			return fail(400, { error: 'Project Title and Description are required.' });
 
 		try {
 			await db.insert(project).values({
@@ -161,6 +183,7 @@ export const actions: Actions = {
 				groupCategory,
 				sortOrder: sortOrderRaw ? parseInt(sortOrderRaw, 10) : 0
 			});
+			invalidatePortfolio();
 			return { success: true, message: 'Project added successfully!' };
 		} catch (err) {
 			console.error(err);
@@ -169,7 +192,8 @@ export const actions: Actions = {
 	},
 
 	updateProject: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email)) return fail(401, { error: 'Unauthorized' });
+		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const id = parseInt(formData.get('id')?.toString() || '0', 10);
 		if (!id) return fail(400, { error: 'ID is required.' });
@@ -178,10 +202,16 @@ export const actions: Actions = {
 		const description = formData.get('description')?.toString().trim();
 		const link = formData.get('link')?.toString().trim() || '#';
 		const groupCategory = formData.get('groupCategory')?.toString().trim() || 'webAndFullStack';
-		const categoriesRaw = formData.get('categories')?.toString().split(',').map((c) => c.trim()).filter(Boolean) || ['Web'];
+		const categoriesRaw = formData
+			.get('categories')
+			?.toString()
+			.split(',')
+			.map((c) => c.trim())
+			.filter(Boolean) || ['Web'];
 		const sortOrderRaw = formData.get('sortOrder')?.toString();
 
-		if (!title || !description) return fail(400, { error: 'Project Title and Description are required.' });
+		if (!title || !description)
+			return fail(400, { error: 'Project Title and Description are required.' });
 
 		try {
 			await db
@@ -196,6 +226,7 @@ export const actions: Actions = {
 					updatedAt: new Date()
 				})
 				.where(eq(project.id, id));
+			invalidatePortfolio();
 			return { success: true, message: 'Project updated successfully!' };
 		} catch (err) {
 			console.error(err);
@@ -204,13 +235,15 @@ export const actions: Actions = {
 	},
 
 	deleteProject: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email)) return fail(401, { error: 'Unauthorized' });
+		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const id = parseInt(formData.get('id')?.toString() || '0', 10);
 		if (!id) return fail(400, { error: 'ID is required.' });
 
 		try {
 			await db.delete(project).where(eq(project.id, id));
+			invalidatePortfolio();
 			return { success: true, message: 'Project deleted successfully!' };
 		} catch (err) {
 			console.error(err);
@@ -220,7 +253,8 @@ export const actions: Actions = {
 
 	// --- ACADEMIC ACTIONS ---
 	createAcademic: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email)) return fail(401, { error: 'Unauthorized' });
+		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const year = formData.get('year')?.toString().trim();
 		const icon = formData.get('icon')?.toString().trim() || 'graduationCap';
@@ -236,6 +270,7 @@ export const actions: Actions = {
 				content,
 				sortOrder: sortOrderRaw ? parseInt(sortOrderRaw, 10) : 0
 			});
+			invalidatePortfolio();
 			return { success: true, message: 'Academic milestone added successfully!' };
 		} catch (err) {
 			console.error(err);
@@ -244,7 +279,8 @@ export const actions: Actions = {
 	},
 
 	updateAcademic: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email)) return fail(401, { error: 'Unauthorized' });
+		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const id = parseInt(formData.get('id')?.toString() || '0', 10);
 		if (!id) return fail(400, { error: 'ID is required.' });
@@ -267,6 +303,7 @@ export const actions: Actions = {
 					updatedAt: new Date()
 				})
 				.where(eq(academic.id, id));
+			invalidatePortfolio();
 			return { success: true, message: 'Academic milestone updated successfully!' };
 		} catch (err) {
 			console.error(err);
@@ -275,13 +312,15 @@ export const actions: Actions = {
 	},
 
 	deleteAcademic: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email)) return fail(401, { error: 'Unauthorized' });
+		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const id = parseInt(formData.get('id')?.toString() || '0', 10);
 		if (!id) return fail(400, { error: 'ID is required.' });
 
 		try {
 			await db.delete(academic).where(eq(academic.id, id));
+			invalidatePortfolio();
 			return { success: true, message: 'Academic milestone deleted successfully!' };
 		} catch (err) {
 			console.error(err);
@@ -291,7 +330,8 @@ export const actions: Actions = {
 
 	// --- CONTACT ACTIONS ---
 	createContact: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email)) return fail(401, { error: 'Unauthorized' });
+		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const name = formData.get('name')?.toString().trim();
 		const value = formData.get('value')?.toString().trim();
@@ -299,7 +339,8 @@ export const actions: Actions = {
 		const icon = formData.get('icon')?.toString().trim() || 'mail';
 		const sortOrderRaw = formData.get('sortOrder')?.toString();
 
-		if (!name || !value || !link) return fail(400, { error: 'Contact Name, Value, and Link are required.' });
+		if (!name || !value || !link)
+			return fail(400, { error: 'Contact Name, Value, and Link are required.' });
 
 		try {
 			await db.insert(contact).values({
@@ -309,6 +350,7 @@ export const actions: Actions = {
 				icon,
 				sortOrder: sortOrderRaw ? parseInt(sortOrderRaw, 10) : 0
 			});
+			invalidatePortfolio();
 			return { success: true, message: 'Contact entry added successfully!' };
 		} catch (err) {
 			console.error(err);
@@ -317,7 +359,8 @@ export const actions: Actions = {
 	},
 
 	updateContact: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email)) return fail(401, { error: 'Unauthorized' });
+		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const id = parseInt(formData.get('id')?.toString() || '0', 10);
 		if (!id) return fail(400, { error: 'ID is required.' });
@@ -328,7 +371,8 @@ export const actions: Actions = {
 		const icon = formData.get('icon')?.toString().trim() || 'mail';
 		const sortOrderRaw = formData.get('sortOrder')?.toString();
 
-		if (!name || !value || !link) return fail(400, { error: 'Contact Name, Value, and Link are required.' });
+		if (!name || !value || !link)
+			return fail(400, { error: 'Contact Name, Value, and Link are required.' });
 
 		try {
 			await db
@@ -342,6 +386,7 @@ export const actions: Actions = {
 					updatedAt: new Date()
 				})
 				.where(eq(contact.id, id));
+			invalidatePortfolio();
 			return { success: true, message: 'Contact entry updated successfully!' };
 		} catch (err) {
 			console.error(err);
@@ -350,13 +395,15 @@ export const actions: Actions = {
 	},
 
 	deleteContact: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email)) return fail(401, { error: 'Unauthorized' });
+		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const id = parseInt(formData.get('id')?.toString() || '0', 10);
 		if (!id) return fail(400, { error: 'ID is required.' });
 
 		try {
 			await db.delete(contact).where(eq(contact.id, id));
+			invalidatePortfolio();
 			return { success: true, message: 'Contact entry deleted successfully!' };
 		} catch (err) {
 			console.error(err);

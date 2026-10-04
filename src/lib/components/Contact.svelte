@@ -1,4 +1,5 @@
 <script lang="ts">
+	import snapshot from '$lib/portfolio.json';
 	import { HugeiconsIcon } from '@hugeicons/svelte';
 	import { MailIcon, GithubIcon, Linkedin01Icon } from '@hugeicons/core-free-icons';
 
@@ -10,44 +11,17 @@
 		icon: string;
 	}
 
-	let { contacts = [] }: { contacts?: ContactItem[] } = $props();
+	let { contacts = snapshot.contacts }: { contacts?: ContactItem[] } = $props();
 
-	const iconMap: Record<string, any> = {
+	const iconMap: Record<string, typeof MailIcon> = {
 		mail: MailIcon,
 		github: GithubIcon,
 		linkedin: Linkedin01Icon
 	};
 
-	const defaultContacts = [
-		{
-			name: 'Email',
-			value: 'aaryanadehade@gmail.com',
-			link: 'mailto:aaryanadehade@gmail.com',
-			iconComponent: MailIcon
-		},
-		{
-			name: 'GitHub',
-			value: '@dehadeaaryan',
-			link: 'https://github.com/dehadeaaryan',
-			iconComponent: GithubIcon
-		},
-		{
-			name: 'LinkedIn',
-			value: 'Aaryan Dehade',
-			link: 'https://linkedin.com/in/aaryandehade',
-			iconComponent: Linkedin01Icon
-		}
-	];
-
-	const displayContacts = $derived.by(() => {
-		if (contacts && contacts.length > 0) {
-			return contacts.map((c) => ({
-				...c,
-				iconComponent: iconMap[c.icon] || MailIcon
-			}));
-		}
-		return defaultContacts;
-	});
+	const displayContacts = $derived(
+		contacts.map((c) => ({ ...c, iconComponent: iconMap[c.icon] || MailIcon }))
+	);
 </script>
 
 <section id="contact">
@@ -61,11 +35,11 @@
 	</div>
 
 	<div class="contact-grid">
-		{#each displayContacts as contact}
+		{#each displayContacts as contact (contact.name)}
 			<a
 				href={contact.link}
 				target="_blank"
-				rel="noopener noreferrer"
+				rel="external noopener noreferrer"
 				class="glass-contact-card group"
 			>
 				<div class="icon-wrapper">

@@ -1,11 +1,11 @@
 # 1. Build stage
 # Use the official Bun image for a smaller and faster build
-FROM oven/bun:1-alpine AS build
+FROM oven/bun:1.3.11-alpine AS build
 
 WORKDIR /app
 
-# Install dependencies. Bun will use bun.lockb if it exists.
-COPY package.json bun.lockb ./
+# Install dependencies. Bun will use bun.lock if it exists.
+COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
 # Copy the rest of the source code
@@ -15,17 +15,17 @@ COPY . .
 RUN bun run build
 
 # 2. Production stage
-FROM oven/bun:1-alpine AS production
+FROM oven/bun:1.3.11-alpine AS production
 
 WORKDIR /app
 
 # Copy production artifacts from the build stage
 COPY --from=build /app/build ./build
 COPY --from=build /app/package.json ./package.json
-COPY --from=build /app/bun.lockb ./bun.lockb
+COPY --from=build /app/bun.lock ./bun.lock
 
 # Install only production dependencies
-RUN bun install --production
+RUN bun install --production --frozen-lockfile
 
 # Expose the port the app will run on
 EXPOSE 3000
