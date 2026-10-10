@@ -159,10 +159,20 @@
 
 	body {
 		color: var(--color-foreground);
+		min-height: 100svh;
+		/* Keep the negative-z decoration above the document canvas. */
+		isolation: isolate;
 	}
 
 	html {
 		font-family: var(--font-sans);
+		background-color: var(--background);
+		/* Safari's obscured areas also need a painted document background. */
+		background-image:
+			radial-gradient(ellipse at 50% 0%, rgb(255 122 48 / 25%), transparent 65%),
+			radial-gradient(ellipse at 50% 100%, rgb(255 122 48 / 20%), transparent 65%);
+		background-size: 100% 100lvh;
+		background-repeat: repeat-y;
 	}
 }
 /* Keep keyboard focus visible and respect the visitor's motion preference. */

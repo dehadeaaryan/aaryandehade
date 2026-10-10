@@ -39,23 +39,31 @@
 
 <svelte:window bind:innerWidth={width} bind:innerHeight={height} onmousemove={handleMouseMove} />
 
-<div
-	class="pointer-events-none fixed top-0 left-0 -z-10 h-lvh w-full overflow-hidden bg-background"
-	style=""
->
-	<div class="absolute inset-0 h-lvh" style:transform style="">
+<div class="background-canvas pointer-events-none -z-10" aria-hidden="true">
+	<div class="absolute inset-0" style:transform>
 		<div class="blob blob-orange-1"></div>
 		<div class="blob blob-orange-2"></div>
 		<div class="blob blob-orange-3"></div>
 	</div>
 
-	<div
-		class="grain-bg pointer-events-none absolute inset-0 h-lvh opacity-[0.25] mix-blend-overlay"
-	></div>
+	<div class="grain-bg pointer-events-none absolute inset-0 opacity-[0.25] mix-blend-overlay"></div>
 </div>
 
 <style lang="postcss">
 	@reference '../../routes/layout.css';
+
+	.background-canvas {
+		position: fixed;
+		/* Overscan the blur beyond Safari's changing toolbars and display cutouts. */
+		top: calc(-64px - env(safe-area-inset-top, 0px));
+		left: calc(-64px - env(safe-area-inset-left, 0px));
+		right: calc(-64px - env(safe-area-inset-right, 0px));
+		bottom: calc(-96px - env(safe-area-inset-bottom, 0px));
+		min-height: calc(
+			100lvh + 160px + env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px)
+		);
+		overflow: hidden;
+	}
 
 	.grain-bg {
 		background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='10' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
