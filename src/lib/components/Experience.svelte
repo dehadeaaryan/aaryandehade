@@ -55,7 +55,6 @@
 
 <section id="experience">
 	<div class="header-wrapper">
-		<span class="theme-badge">Career</span>
 		<h2 id="experience-title" class="section-title">Experience</h2>
 		<p class="section-subtitle">
 			My professional journey, internships, and technical contributions.
@@ -186,10 +185,6 @@
 	/* Header Styling */
 	.header-wrapper {
 		@apply mb-12 flex flex-col items-center justify-center gap-4 px-4;
-	}
-
-	.theme-badge {
-		@apply rounded-full border border-orange/30 bg-orange/10 px-4 py-1.5 text-xs font-black tracking-[0.2em] text-orange uppercase shadow-sm backdrop-blur-md;
 	}
 
 	.section-title {

@@ -21,7 +21,6 @@
 
 <section id="projects" aria-labelledby="projects-title">
 	<div class="header-wrapper">
-		<span class="theme-badge">Portfolio</span>
 		<h2 id="projects-title" class="section-title">Projects</h2>
 		<p class="section-subtitle">
 			A collection of my web applications, machine learning models, and software utilities.
@@ -94,10 +93,6 @@
 
 	.header-wrapper {
 		@apply mb-12 flex flex-col items-center justify-center gap-4 px-4;
-	}
-
-	.theme-badge {
-		@apply rounded-full border border-orange/30 bg-orange/10 px-4 py-1.5 text-xs font-black tracking-[0.2em] text-orange uppercase shadow-sm backdrop-blur-md;
 	}
 
 	.section-title {

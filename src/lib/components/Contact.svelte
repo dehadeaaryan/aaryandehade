@@ -26,7 +26,6 @@
 
 <section id="contact">
 	<div class="header-wrapper">
-		<span class="theme-badge">Connect</span>
 		<h2 class="section-title">Let's Talk</h2>
 		<p class="section-subtitle">
 			I'm always open to discussing new opportunities, collaborations, or just having a chat about
@@ -64,10 +63,6 @@
 
 	.header-wrapper {
 		@apply mb-12 flex flex-col items-center justify-center gap-4;
-	}
-
-	.theme-badge {
-		@apply rounded-full border border-orange/30 bg-orange/10 px-4 py-1.5 text-xs font-black tracking-[0.2em] text-orange uppercase shadow-sm backdrop-blur-md;
 	}
 
 	.section-title {

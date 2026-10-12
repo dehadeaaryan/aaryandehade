@@ -87,7 +87,6 @@
 
 <section id="academics">
 	<div class="header-wrapper">
-		<span class="theme-badge">Milestones</span>
 		<h2 class="section-title">Academics</h2>
 		<p class="section-subtitle">My educational journey, leadership roles, and certifications.</p>
 	</div>
@@ -160,10 +159,6 @@
 
 	.header-wrapper {
 		@apply mb-10 flex flex-col items-center justify-center gap-4;
-	}
-
-	.theme-badge {
-		@apply rounded-full border border-orange/30 bg-orange/10 px-4 py-1.5 text-xs font-black tracking-[0.2em] text-orange uppercase shadow-sm backdrop-blur-md;
 	}
 
 	.section-title {

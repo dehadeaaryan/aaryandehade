@@ -46,7 +46,7 @@
 		<div class="blob blob-orange-3"></div>
 	</div>
 
-	<div class="grain-bg pointer-events-none absolute inset-0 opacity-[0.25] mix-blend-overlay"></div>
+	<div class="grain-bg pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-overlay"></div>
 </div>
 
 <style lang="postcss">
