@@ -39,8 +39,9 @@
 			class={cn('flex shrink-0 justify-around gap-(--gap)', {
 				'animate-marquee flex-row': !vertical,
 				'animate-marquee-vertical flex-col': vertical,
-				'group-focus-within:paused group-hover:paused': pauseOnHover,
-				'direction-[reverse]': reverse
+				'group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused]':
+					pauseOnHover,
+				'[animation-direction:reverse]': reverse
 			})}
 		>
 			{@render children?.()}

@@ -4,9 +4,10 @@
 		description: string;
 		link: string;
 		categories: string[];
+		compact?: boolean;
 	};
 
-	let { title, description, link, categories }: Props = $props();
+	let { title, description, link, categories, compact = false }: Props = $props();
 </script>
 
 <a
@@ -14,11 +15,12 @@
 	target="_blank"
 	rel="external noopener noreferrer"
 	class="glass-project-card group/card"
+	class:compact
 >
-	<div class="flex h-full flex-col p-6 md:p-8">
+	<div class="card-content flex h-full flex-col p-6 md:p-8">
 		<h3 class="card-title group-hover/card:text-orange">{title}</h3>
 		<p class="card-description">{description}</p>
-		<div class="mt-auto flex flex-wrap gap-2 pt-6">
+		<div class="card-tags mt-auto flex flex-wrap gap-2 pt-6">
 			{#each categories as category, index (index)}
 				<span class="glass-tag">
 					{category}
@@ -32,7 +34,7 @@
 	@reference '../../routes/layout.css';
 
 	.glass-project-card {
-		@apply block w-full rounded-[2rem] text-left transition-all duration-500;
+		@apply block w-full rounded-[2rem] text-left transition-[border-color,box-shadow] duration-500;
 
 		/* The Liquid Glass Core */
 		@apply border border-white/40 bg-white/45 backdrop-blur-3xl backdrop-saturate-[1.8];
@@ -41,11 +43,23 @@
 		/* Base inner lighting to create thick glass volume */
 		@apply shadow-[inset_0_1px_2px_rgba(255,255,255,0.5)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)];
 
-		/* Hover physics: Float up and catch more light on the edges */
-		@apply hover:-translate-y-1 hover:border-white/70 dark:hover:border-white/30;
+		/* Keep the hit area stationary while highlighting the glass edges. */
+		@apply hover:border-white/70 dark:hover:border-white/30;
 
 		/* Intensify the inner rim light on hover */
 		@apply hover:shadow-[inset_0_2px_8px_rgba(255,255,255,0.7)] dark:hover:shadow-[inset_0_1px_4px_rgba(255,255,255,0.3)];
+	}
+
+	.compact {
+		border-radius: 1.25rem;
+	}
+
+	.compact .card-content {
+		padding: 1rem;
+	}
+
+	.compact .card-tags {
+		padding-top: 1rem;
 	}
 
 	.card-title {
