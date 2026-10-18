@@ -25,7 +25,7 @@
 <header>
 	<div id="header-container">
 		<a href="#home" id="home-link" aria-label="Aaryan home">
-			<img src="/apple-touch-icon.png" alt="" width="40" height="40" />
+			<img src="/ad-logo.png?v=cyan-glitch-1" alt="" width="46" height="32" />
 			<span>Aaryan<span class="brand-period">.</span></span>
 		</a>
 
@@ -136,15 +136,17 @@
 		@apply text-orange;
 	}
 	#home-link img {
-		width: 36px;
-		height: 36px;
-		border: 1px solid rgb(255 255 255 / 20%);
-		border-radius: 8px;
-		box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
-		transition: transform 200ms;
+		width: 46px;
+		height: 32px;
+		object-fit: contain;
+		filter: drop-shadow(0 0 8px rgb(0 234 255 / 25%));
+		transition:
+			transform 200ms,
+			filter 200ms;
 	}
 	#home-link:hover img {
 		transform: rotate(-3deg) scale(1.05);
+		filter: drop-shadow(0 0 11px rgb(0 234 255 / 45%));
 	}
 	.brand-period {
 		@apply text-orange;
