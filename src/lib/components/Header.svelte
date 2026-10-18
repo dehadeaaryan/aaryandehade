@@ -25,7 +25,7 @@
 <header>
 	<div id="header-container">
 		<a href="#home" id="home-link" aria-label="Aaryan home">
-			<img src="/ad-logo.png?v=cyan-glitch-1" alt="" width="46" height="32" />
+			<img src="/ad-logo.png?v=orange-glass-v1" alt="" width="46" height="32" />
 			<span>Aaryan<span class="brand-period">.</span></span>
 		</a>
 
@@ -139,14 +139,14 @@
 		width: 46px;
 		height: 32px;
 		object-fit: contain;
-		filter: drop-shadow(0 0 8px rgb(0 234 255 / 25%));
+		filter: drop-shadow(0 0 8px rgb(255 122 48 / 25%));
 		transition:
 			transform 200ms,
 			filter 200ms;
 	}
 	#home-link:hover img {
 		transform: rotate(-3deg) scale(1.05);
-		filter: drop-shadow(0 0 11px rgb(0 234 255 / 45%));
+		filter: drop-shadow(0 0 11px rgb(255 122 48 / 45%));
 	}
 	.brand-period {
 		@apply text-orange;

@@ -235,7 +235,7 @@
 				</a>
 				<span class="h-4 w-px bg-foreground/20"></span>
 				<a href={resolve('/')} class="admin-brand"
-					><img src="/ad-logo.png?v=cyan-glitch-1" width="46" height="32" alt="" /><span
+					><img src="/ad-logo.png?v=orange-glass-v1" width="46" height="32" alt="" /><span
 						>Aaryan<span class="text-orange">.</span><small>Portfolio admin</small></span
 					></a
 				>
@@ -1127,7 +1127,7 @@
 		width: 46px;
 		height: 32px;
 		object-fit: contain;
-		filter: drop-shadow(0 0 8px rgb(0 234 255 / 25%));
+		filter: drop-shadow(0 0 8px rgb(255 122 48 / 25%));
 	}
 	.admin-brand small {
 		display: block;
