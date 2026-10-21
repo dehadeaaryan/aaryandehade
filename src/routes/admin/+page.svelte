@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
+	import { PUBLIC_ORIGIN } from '$lib/site-hosts';
 	import { enhance, applyAction } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import type { SubmitFunction } from '@sveltejs/kit';
@@ -227,14 +227,14 @@
 		<div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
 			<div class="flex items-center gap-3">
 				<a
-					href={resolve('/')}
+					href={PUBLIC_ORIGIN}
 					class="flex cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/20 px-3 py-1.5 text-xs font-semibold text-foreground/80 transition hover:bg-white/40 dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/20"
 				>
 					<ArrowLeft size={16} />
 					<span>Back to Site</span>
 				</a>
 				<span class="h-4 w-px bg-foreground/20"></span>
-				<a href={resolve('/')} class="admin-brand"
+				<a href={PUBLIC_ORIGIN} class="admin-brand"
 					><img src="/ad-logo.png?v=orange-glass-v1" width="46" height="32" alt="" /><span
 						>Aaryan<span class="text-orange">.</span><small>Portfolio admin</small></span
 					></a

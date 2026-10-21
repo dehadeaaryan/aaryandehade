@@ -4,19 +4,18 @@ import { sveltekitCookies } from 'better-auth/svelte-kit';
 import { env } from '$env/dynamic/private';
 import { getRequestEvent } from '$app/server';
 import { db } from '$lib/server/db';
+import { dev } from '$app/environment';
+import { ADMIN_ORIGIN } from '$lib/site-hosts';
+
+const authOrigin = env.AUTH_ORIGIN || (dev ? 'http://localhost:5173' : ADMIN_ORIGIN);
 
 export const auth = betterAuth({
-	baseURL: env.ORIGIN || 'https://aaryandehade.com',
+	baseURL: authOrigin,
 	secret: env.BETTER_AUTH_SECRET,
 	database: drizzleAdapter(db, { provider: 'pg' }),
-	trustedOrigins: [
-		'https://aaryandehade.com',
-		'https://www.aaryandehade.com',
-		'http://localhost:5173',
-		'http://localhost:3000'
-	],
+	trustedOrigins: [authOrigin],
 	advanced: {
-		useSecureCookies: true
+		useSecureCookies: new URL(authOrigin).protocol === 'https:'
 	},
 	socialProviders: {
 		google: {

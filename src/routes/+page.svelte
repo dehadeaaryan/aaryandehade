@@ -11,6 +11,8 @@
 
 <svelte:head>
 	<title>Aaryan Dehade | Software Engineer</title>
+	<link rel="canonical" href="https://aaryandehade.com/" />
+	<meta name="robots" content="index, follow" />
 </svelte:head>
 
 <Header />

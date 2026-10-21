@@ -10,9 +10,6 @@ const config = {
 	},
 	kit: {
 		adapter: adapter(),
-		csrf: {
-			trustedOrigins: ['https://aaryandehade.com', 'https://www.aaryandehade.com']
-		},
 		typescript: {
 			config: (config) => ({
 				...config,

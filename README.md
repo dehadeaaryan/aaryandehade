@@ -12,7 +12,7 @@ cp .env.example .env
 bun run dev
 ```
 
-Configure `DATABASE_URL`, `ORIGIN`, `BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `ADMIN_EMAIL`. Database configuration is required; there is no embedded credential or remote fallback. URL-encode special characters in database passwords.
+Configure `DATABASE_URL`, `AUTH_ORIGIN`, `BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `ADMIN_EMAIL`. Database configuration is required; there is no embedded credential or remote fallback. URL-encode special characters in database passwords.
 
 ```env
 DATABASE_URL="postgresql://USER:URL_ENCODED_PASSWORD@HOST:5432/DATABASE"
@@ -31,10 +31,17 @@ Seeding inserts missing records inside a transaction and preserves existing reco
 
 ## Validation and deployment
 
+Unknown paths render the branded `src/routes/+error.svelte` page with an HTTP 404 status. Admin and error pages use `noindex`; the homepage owns its canonical URL and indexing metadata. Starter `/demo/*` routes are intentionally removed.
+
+The production editor lives at `https://admin.aaryandehade.com/` in the same deployment. Public `/admin` links redirect there; public-host edit requests and auth endpoints are blocked. Local development keeps `/admin`. Follow [the admin subdomain deployment guide](docs/admin-subdomain.md) before deploying: DNS, Google OAuth, Coolify domains, and origin settings must change together. Unknown subdomains remain a DNS/proxy concern, not an application catch-all.
+
 ```sh
 bun run check
 bun run test:unit --run --project server
 bun run build
+bun run test:e2e
 ```
+
+Browser tests build and serve the app locally with test-only auth settings and an unreachable local database, exercising the public snapshot fallback without accessing production data. They cover missing paths, removed demos, admin redirects, login privacy, and page metadata on desktop and mobile.
 
 The Bun Dockerfile is at `src/lib/components/Dockerfile`; build with the repository root as its context. Set the production environment variables, expose port 3000, and run `bun run build/index.js`. Rotate the PostgreSQL password on the database, then update `DATABASE_URL` locally and in the deployment environment and redeploy.
