@@ -22,6 +22,14 @@ const handleParaglide: Handle = ({ event, resolve }) =>
 
 const handleBetterAuth: Handle = async ({ event, resolve }) => {
 	if (building) return resolve(event);
+	// Coolify's current probe calls GET / on 127.0.0.1. Answer before page loads
+	// so health checks neither expose app routes on unknown hosts nor query Postgres.
+	if (isLoopback(event.url) && event.url.pathname === '/' && event.request.method === 'GET') {
+		return new Response('ok', {
+			status: 200,
+			headers: { 'cache-control': 'no-store', 'content-type': 'text/plain; charset=utf-8' }
+		});
+	}
 	const localOrigin = dev && isLoopback(event.url) ? event.url.origin : env.AUTH_ORIGIN;
 	const policy = hostPolicy(event.url, event.route.id, localOrigin);
 	if (policy.kind === 'reject') return new Response('Not found', { status: 404 });

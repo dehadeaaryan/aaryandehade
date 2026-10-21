@@ -21,11 +21,17 @@ One repository, one Coolify application, one database. The portfolio is served a
 
 5. Deploy this code only after DNS, the OAuth callback, domains, and environment settings are ready. Do not enable cross-subdomain cookies. Existing main-domain sessions do not transfer; sign in again on the admin hostname.
 
+The current Coolify probe (`GET http://127.0.0.1:3000/`) receives a lightweight `200 ok` response directly, before routing or database access, so it keeps working with the hostname guard. You can also set Coolify's Health Check path to `/health` (same port 3000, host `127.0.0.1`, method `GET`, scheme `http`, expected status `200`). That endpoint is available only on loopback, performs no database queries, and does not admit arbitrary hostnames.
+
+In the Coolify application's **Health Check** settings, use path `/health`, port `3000`, host `127.0.0.1`, method `GET`, scheme `http`, and expected status `200`. This endpoint bypasses the hostname guard only on loopback and does not query the database, so it checks that the server responds without using the portfolio's database-backed homepage or admitting arbitrary hostnames.
+
 ## Verify after deployment
 
 Before deployment, run `bun run check`, `bun run test:unit --run --project server`, and `bun run test:hosts`. The last command checks both production hostnames directly against the built server using test-only credentials, without needing DNS, a local listening port, or the production database. It does not perform a real Google login.
 
 - The portfolio still works on the main domain and `www`.
+- The loopback health probes at `http://127.0.0.1:3000/` and `/health` return `200 ok`.
+- The loopback health probe at `http://127.0.0.1:3000/health` returns `200 ok`.
 - `/admin` on either public domain redirects to `https://admin.aaryandehade.com/`.
 - The admin root redirects signed-out visitors to `/admin/login`; Google login returns to the admin hostname.
 - Your authorized account can edit content and sign out. Another account cannot load or mutate admin data.

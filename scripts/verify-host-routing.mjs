@@ -42,6 +42,14 @@ assert.ok(loginHtml.includes(`href="${publicOrigin}"`));
 const session = await request(adminOrigin, '/api/auth/get-session');
 assert.equal(session.status, 200);
 assert.equal(await session.json(), null);
+const health = await request('http://127.0.0.1:3000', '/health');
+assert.equal(health.status, 200);
+assert.equal(await health.text(), 'ok');
+assert.equal(health.headers.get('cache-control'), 'no-store');
+const coolifyHealth = await request('http://127.0.0.1:3000', '/');
+assert.equal(coolifyHealth.status, 200);
+assert.equal(await coolifyHealth.text(), 'ok');
+assert.equal(coolifyHealth.headers.get('cache-control'), 'no-store');
 for (const path of ['/', '/admin/login']) {
 	const crossOrigin = await request(adminOrigin, path, {
 		method: 'POST',
@@ -63,6 +71,7 @@ const failure = await edit.json();
 assert.equal(failure.type, 'failure');
 assert.equal(failure.status, 401);
 assert.equal((await request('https://xyz.aaryandehade.com', '/admin')).status, 404);
+assert.equal((await request('https://xyz.aaryandehade.com', '/health')).status, 404);
 for (const origin of [publicOrigin, adminOrigin]) {
 	const missing = await request(origin, '/dne');
 	assert.equal(missing.status, 404);

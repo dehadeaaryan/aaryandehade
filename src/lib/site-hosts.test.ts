@@ -50,4 +50,12 @@ describe('admin host boundary', () => {
 			hostPolicy(new URL('/admin', 'https://evil.test'), '/admin', 'https://evil.test').kind
 		).toBe('reject');
 	});
+	it('allows the isolated health probe on loopback only', () => {
+		expect(hostPolicy(new URL('http://127.0.0.1:3000/health'), '/health')).toEqual({
+			kind: 'serve',
+			authenticate: false
+		});
+		expect(hostPolicy(new URL('http://127.0.0.1:3000/'), '/').kind).toBe('reject');
+		expect(hostPolicy(new URL('https://evil.test/health'), '/health').kind).toBe('reject');
+	});
 });

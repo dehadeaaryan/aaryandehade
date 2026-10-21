@@ -14,6 +14,10 @@ export function hostPolicy(url: URL, routeId: string | null, localOrigin?: strin
 	const local = localOrigin && url.origin === localOrigin && isLoopback(url);
 	const adminRoute = routeId === '/admin' || routeId?.startsWith('/admin/');
 	const authRoute = url.pathname === '/api/auth' || url.pathname.startsWith('/api/auth/');
+	// Coolify probes the app directly on loopback, without the public hostname.
+	if (isLoopback(url) && url.pathname === '/health') {
+		return { kind: 'serve' as const, authenticate: false };
+	}
 	if (local) return { kind: 'serve' as const, authenticate: !!adminRoute || authRoute };
 	if (isAdminHost(url)) {
 		if (url.pathname === '/admin') return { kind: 'redirect' as const, location: '/' };
