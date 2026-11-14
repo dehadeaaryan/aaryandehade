@@ -1,14 +1,12 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { auth } from '$lib/server/auth';
-import { env } from '$env/dynamic/private';
+import { isAdmin } from '$lib/server/admin';
 import { isAdminHost } from '$lib/site-hosts';
-
-const ALLOWED_ADMIN_EMAIL = env.ADMIN_EMAIL || 'dehadeaaryan@gmail.com';
 
 export const load: PageServerLoad = (event) => {
 	if (event.locals.user) {
-		if (event.locals.user.email?.toLowerCase() === ALLOWED_ADMIN_EMAIL.toLowerCase()) {
+		if (isAdmin(event.locals.user)) {
 			throw redirect(302, isAdminHost(event.url) ? '/' : '/admin');
 		}
 	}

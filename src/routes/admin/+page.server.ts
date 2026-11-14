@@ -4,22 +4,16 @@ import { experience, project, academic, contact } from '$lib/server/db/schema';
 import { auth } from '$lib/server/auth';
 import { asc, eq } from 'drizzle-orm';
 import { fail, redirect } from '@sveltejs/kit';
-import { env } from '$env/dynamic/private';
+import { isAdmin } from '$lib/server/admin';
+import { isSafeLink, safeLinks } from '$lib/server/safe-links';
 import type { PageServerLoad, Actions } from './$types';
-
-const ALLOWED_ADMIN_EMAIL = env.ADMIN_EMAIL || 'dehadeaaryan@gmail.com';
-
-function isAuthorized(email?: string | null): boolean {
-	if (!email) return false;
-	return email.toLowerCase() === ALLOWED_ADMIN_EMAIL.toLowerCase();
-}
 
 export const load: PageServerLoad = async (event) => {
 	if (!event.locals.user) {
 		throw redirect(302, '/admin/login');
 	}
 
-	if (!isAuthorized(event.locals.user.email)) {
+	if (!isAdmin(event.locals.user)) {
 		await auth.api.signOut({ headers: event.request.headers });
 		throw redirect(302, '/admin/login?error=unauthorized');
 	}
@@ -42,10 +36,10 @@ export const load: PageServerLoad = async (event) => {
 
 	return {
 		user: event.locals.user,
-		experiences,
-		projects,
+		experiences: safeLinks(experiences),
+		projects: safeLinks(projects),
 		academics,
-		contacts
+		contacts: safeLinks(contacts)
 	};
 };
 
@@ -59,13 +53,15 @@ export const actions: Actions = {
 
 	// --- EXPERIENCE ACTIONS ---
 	createExperience: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+		if (!event.locals.user || !isAdmin(event.locals.user))
 			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const company = formData.get('company')?.toString().trim();
 		const title = formData.get('title')?.toString().trim();
 		const dates = formData.get('dates')?.toString().trim();
 		const link = formData.get('link')?.toString().trim() || '#';
+		if (link && !isSafeLink(link))
+			return fail(400, { error: 'Link must use HTTP, HTTPS, mailto, tel, or a local path.' });
 		const logo = formData.get('logo')?.toString().trim() || '/logos/apple-logo.jpg';
 		const sortOrderRaw = formData.get('sortOrder')?.toString();
 		const descriptionRaw = formData
@@ -95,7 +91,7 @@ export const actions: Actions = {
 	},
 
 	updateExperience: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+		if (!event.locals.user || !isAdmin(event.locals.user))
 			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const id = parseInt(formData.get('id')?.toString() || '0', 10);
@@ -105,6 +101,8 @@ export const actions: Actions = {
 		const title = formData.get('title')?.toString().trim();
 		const dates = formData.get('dates')?.toString().trim();
 		const link = formData.get('link')?.toString().trim() || '#';
+		if (link && !isSafeLink(link))
+			return fail(400, { error: 'Link must use HTTP, HTTPS, mailto, tel, or a local path.' });
 		const logo = formData.get('logo')?.toString().trim() || '/logos/apple-logo.jpg';
 		const sortOrderRaw = formData.get('sortOrder')?.toString();
 		const descriptionRaw = formData
@@ -138,7 +136,7 @@ export const actions: Actions = {
 	},
 
 	deleteExperience: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+		if (!event.locals.user || !isAdmin(event.locals.user))
 			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const id = parseInt(formData.get('id')?.toString() || '0', 10);
@@ -156,12 +154,14 @@ export const actions: Actions = {
 
 	// --- PROJECT ACTIONS ---
 	createProject: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+		if (!event.locals.user || !isAdmin(event.locals.user))
 			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const title = formData.get('title')?.toString().trim();
 		const description = formData.get('description')?.toString().trim();
 		const link = formData.get('link')?.toString().trim() || '#';
+		if (link && !isSafeLink(link))
+			return fail(400, { error: 'Link must use HTTP, HTTPS, mailto, tel, or a local path.' });
 		const groupCategory = formData.get('groupCategory')?.toString().trim() || 'webAndFullStack';
 		const categoriesRaw = formData
 			.get('categories')
@@ -192,7 +192,7 @@ export const actions: Actions = {
 	},
 
 	updateProject: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+		if (!event.locals.user || !isAdmin(event.locals.user))
 			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const id = parseInt(formData.get('id')?.toString() || '0', 10);
@@ -201,6 +201,8 @@ export const actions: Actions = {
 		const title = formData.get('title')?.toString().trim();
 		const description = formData.get('description')?.toString().trim();
 		const link = formData.get('link')?.toString().trim() || '#';
+		if (link && !isSafeLink(link))
+			return fail(400, { error: 'Link must use HTTP, HTTPS, mailto, tel, or a local path.' });
 		const groupCategory = formData.get('groupCategory')?.toString().trim() || 'webAndFullStack';
 		const categoriesRaw = formData
 			.get('categories')
@@ -235,7 +237,7 @@ export const actions: Actions = {
 	},
 
 	deleteProject: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+		if (!event.locals.user || !isAdmin(event.locals.user))
 			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const id = parseInt(formData.get('id')?.toString() || '0', 10);
@@ -253,7 +255,7 @@ export const actions: Actions = {
 
 	// --- ACADEMIC ACTIONS ---
 	createAcademic: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+		if (!event.locals.user || !isAdmin(event.locals.user))
 			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const year = formData.get('year')?.toString().trim();
@@ -279,7 +281,7 @@ export const actions: Actions = {
 	},
 
 	updateAcademic: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+		if (!event.locals.user || !isAdmin(event.locals.user))
 			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const id = parseInt(formData.get('id')?.toString() || '0', 10);
@@ -312,7 +314,7 @@ export const actions: Actions = {
 	},
 
 	deleteAcademic: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+		if (!event.locals.user || !isAdmin(event.locals.user))
 			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const id = parseInt(formData.get('id')?.toString() || '0', 10);
@@ -330,12 +332,14 @@ export const actions: Actions = {
 
 	// --- CONTACT ACTIONS ---
 	createContact: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+		if (!event.locals.user || !isAdmin(event.locals.user))
 			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const name = formData.get('name')?.toString().trim();
 		const value = formData.get('value')?.toString().trim();
 		const link = formData.get('link')?.toString().trim();
+		if (link && !isSafeLink(link))
+			return fail(400, { error: 'Link must use HTTP, HTTPS, mailto, tel, or a local path.' });
 		const icon = formData.get('icon')?.toString().trim() || 'mail';
 		const sortOrderRaw = formData.get('sortOrder')?.toString();
 
@@ -359,7 +363,7 @@ export const actions: Actions = {
 	},
 
 	updateContact: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+		if (!event.locals.user || !isAdmin(event.locals.user))
 			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const id = parseInt(formData.get('id')?.toString() || '0', 10);
@@ -368,6 +372,8 @@ export const actions: Actions = {
 		const name = formData.get('name')?.toString().trim();
 		const value = formData.get('value')?.toString().trim();
 		const link = formData.get('link')?.toString().trim();
+		if (link && !isSafeLink(link))
+			return fail(400, { error: 'Link must use HTTP, HTTPS, mailto, tel, or a local path.' });
 		const icon = formData.get('icon')?.toString().trim() || 'mail';
 		const sortOrderRaw = formData.get('sortOrder')?.toString();
 
@@ -395,7 +401,7 @@ export const actions: Actions = {
 	},
 
 	deleteContact: async (event) => {
-		if (!event.locals.user || !isAuthorized(event.locals.user.email))
+		if (!event.locals.user || !isAdmin(event.locals.user))
 			return fail(401, { error: 'Unauthorized' });
 		const formData = await event.request.formData();
 		const id = parseInt(formData.get('id')?.toString() || '0', 10);

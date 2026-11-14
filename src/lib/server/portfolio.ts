@@ -3,6 +3,7 @@ import { db } from './db';
 import { experience, project, academic, contact } from './db/schema';
 import { asc } from 'drizzle-orm';
 import { createPublicCache } from './public-cache';
+import { safeLinks } from './safe-links';
 
 const caches = {
 	experiences: createPublicCache(
@@ -75,7 +76,13 @@ export async function loadPortfolio() {
 		caches.academics.get(),
 		caches.contacts.get()
 	]);
-	return { experiences, projects, academics, contacts };
+	// Protect visitors from unsafe links already stored before write validation existed.
+	return {
+		experiences: safeLinks(experiences),
+		projects: safeLinks(projects),
+		academics,
+		contacts: safeLinks(contacts)
+	};
 }
 export function invalidatePortfolio() {
 	for (const cache of Object.values(caches)) cache.invalidate();

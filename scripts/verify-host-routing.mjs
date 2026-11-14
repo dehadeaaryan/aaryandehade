@@ -10,8 +10,8 @@ const env = {
 	GOOGLE_CLIENT_SECRET: ''
 };
 Object.assign(process.env, env);
-const { Server } = await import('../build/server/index.js');
-const { manifest } = await import('../build/server/manifest.js');
+const { Server } = await import('../.svelte-kit/output/server/index.js');
+const { manifest } = await import('../.svelte-kit/output/server/manifest.js');
 const server = new Server(manifest);
 await server.init({ env });
 const publicOrigin = 'https://aaryandehade.com';
